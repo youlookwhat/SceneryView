@@ -230,11 +230,14 @@ public class Scenery extends View {
         mRainClipRect.set(0, mRainRect.top, w, mRainRect.bottom);
 
         mMaxTranslationX = leftCloudBottomRoundRadius / 2;
-        setupAnimator();
+//        setupAnimator();
     }
 
 
-    private void setupAnimator(){
+    /**
+     * 设置云的动画
+     */
+    private void setupAnimator() {
         mLeftCloudAnimatorPlayTime = 0;
         mRightCloudAnimatorPlayTime = 0;
 
