@@ -1,5 +1,7 @@
 package me.jingbin.library;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -12,7 +14,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
 
 /**
  * 风景View
@@ -25,25 +26,24 @@ public class Scenery extends View {
     private int mParentWidth = 394;
     private int mParentHeight = 394;
     private int sunWidth = 70;
-    private Path mLeftCloudPath; //the left cloud's path
-    private Path mRightCloudPath; //the left cloud's path
+    private Path mLeftCloudPath;      // the cloud's path
+    private Path mLeftMountainPath;   // the left mountain's path
+    private Path mRightMountainPath;  // the right mountain's path
+    private Path mMidMountainPath;    // the mid mountain's path
     private final static float CLOUD_SCALE_RATIO = 0.85f;
     private Matrix mComputeMatrix = new Matrix(); //The matrix for computing
 
-    private RectF mRainRect; //the rain rect
-    private RectF mRainClipRect; //the rain clip rect
     private float mMaxTranslationX; //The max translation x when do animation.
     private float mLeftCloudAnimatorValue; //The left cloud animator value
-    private float mRightCloudAnimatorValue; //The right cloud animator value
     private Path mComputePath = new Path(); //The path for computing
     private Paint mLeftCloudPaint;
-    private Paint mRightCloudPaint;
+    private Paint mLeftMountainPaint;
+    private Paint mRightMountainPaint;
+    private Paint mMidMountainPaint;
 
     private ValueAnimator mLeftCloudAnimator;
-    private ValueAnimator mRightCloudAnimator;
 
     private long mLeftCloudAnimatorPlayTime;
-    private long mRightCloudAnimatorPlayTime;
 
 
     public Scenery(Context context) {
@@ -63,14 +63,6 @@ public class Scenery extends View {
         init();
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-//        int mSize = Math.min(getMeasuredWidth(), getMeasuredHeight());
-//        mRadius = mSize / 2;
-//        setMeasuredDimension(mSize, mSize);
-    }
-
     // 获取View宽高
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -79,30 +71,39 @@ public class Scenery extends View {
         mParentWidth = mParentHeight = Math.min(getWidth(), getHeight());
 
         sunWidth = getValue(70);
-        Log.e("Scenery", "width = " + getWidth() + "， height = " + getHeight());
+        Log.e("onSizeChanged", "width = " + getWidth() + "， height = " + getHeight());
         drawYun(getWidth() + getValue(200), getHeight());
     }
 
     private void init() {
         mLeftCloudPath = new Path();
-        mRightCloudPath = new Path();
-        mRainRect = new RectF();
-        mRainClipRect = new RectF();
+        mLeftMountainPath = new Path();
+        mRightMountainPath = new Path();
+        mMidMountainPath = new Path();
 
         setLayerType(LAYER_TYPE_SOFTWARE, null);
 
         mLeftCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mLeftCloudPaint.setColor(Color.parseColor("#B6C4F3"));
+        // 中间重复的覆盖
+        mLeftCloudPaint.setAntiAlias(true);
         mLeftCloudPaint.setStyle(Paint.Style.FILL);
 
-        mRightCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mRightCloudPaint.setColor(Color.GRAY);
-        mRightCloudPaint.setStyle(Paint.Style.FILL);
+        mLeftMountainPaint = new Paint();
+        mLeftMountainPaint.setAntiAlias(true);
+        mLeftMountainPaint.setColor(Color.parseColor("#E6E6E8"));
 
-        mLeftCloudPath = new Path();
-        mRightCloudPath = new Path();
-        mRainRect = new RectF();
-        mRainClipRect = new RectF();
+        mRightMountainPaint = new Paint();
+        mRightMountainPaint.setAntiAlias(true);
+        mRightMountainPaint.setColor(Color.parseColor("#E6E6E8"));
+
+        mMidMountainPaint = new Paint();
+        mMidMountainPaint.setAntiAlias(true);
+        mMidMountainPaint.setColor(Color.WHITE);
+
+//        mRightCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//        mRightCloudPaint.setColor(Color.GRAY);
+//        mRightCloudPaint.setStyle(Paint.Style.FILL);
     }
 
     private void initAttrs(Context context, AttributeSet attrs) {
@@ -120,7 +121,7 @@ public class Scenery extends View {
 
         // 背景
         Paint p = new Paint();
-        // 自定义颜色 Color.WHITE
+        // 自定义颜色
         p.setColor(Color.parseColor("#6ABDE8"));
         // 设置画笔的锯齿效果
         p.setAntiAlias(true);
@@ -129,8 +130,9 @@ public class Scenery extends View {
 
         // 太阳
         Paint sunP = new Paint();
-        // 自定义颜色 Color.WHITE
-        sunP.setColor(Color.parseColor("#FFF589"));
+        // 自定义颜色
+//        sunP.setColor(Color.parseColor("#FFF589"));
+        sunP.setColor(Color.YELLOW);
         // 设置画笔的锯齿效果
         sunP.setAntiAlias(true);
         // 画圆
@@ -144,10 +146,10 @@ public class Scenery extends View {
 //        drawRainDrops(canvas);
 //        canvas.restore();
 
-        mComputeMatrix.reset();
-        mComputeMatrix.postTranslate((mMaxTranslationX / 2) * mRightCloudAnimatorValue, 0);
-        mRightCloudPath.transform(mComputeMatrix, mComputePath);
-        canvas.drawPath(mComputePath, mRightCloudPaint);
+//        mComputeMatrix.reset();
+//        mComputeMatrix.postTranslate((mMaxTranslationX / 2) * mRightCloudAnimatorValue, 0);
+//        mRightCloudPath.transform(mComputeMatrix, mComputePath);
+//        canvas.drawPath(mComputePath, mRightCloudPaint);
 
         mComputeMatrix.reset();
         mComputeMatrix.postTranslate(mMaxTranslationX * mLeftCloudAnimatorValue, 0);
@@ -158,7 +160,7 @@ public class Scenery extends View {
     }
 
     /**
-     * 画中间的三个山
+     * 画中间的三座山
      *
      * @param left  中心点左坐标
      * @param right 中心点右坐标
@@ -173,43 +175,38 @@ public class Scenery extends View {
         // 中间山 山的一半的X间距是多少
         int lrBanGao = getValue(150);
 
-        Paint lmp = new Paint();
-        lmp.setAntiAlias(true);
-        lmp.setColor(Color.parseColor("#E6E6E8"));
-        //实例化路径
-        Path path = new Path();
-        path.moveTo(left - lrdPoint, right + lrmYpoint);
-        path.lineTo(left - lrdPoint + lrBanDis, right + lrmYpoint + lrBanGao);
-        path.lineTo(left - lrdPoint - lrBanDis, right + lrmYpoint + lrBanGao);
-        path.close(); // 使这些点构成封闭的多边形
-        canvas.drawPath(path, lmp);
+        // 左山
+        mLeftMountainPath.reset();
+        // 起点
+        mLeftMountainPath.moveTo(left - lrdPoint, right + lrmYpoint);
+        mLeftMountainPath.lineTo(left - lrdPoint + lrBanDis, right + lrmYpoint + lrBanGao);
+        mLeftMountainPath.lineTo(left - lrdPoint - lrBanDis, right + lrmYpoint + lrBanGao);
+        // 使这些点构成封闭的多边形
+        mLeftMountainPath.close();
+        canvas.drawPath(mLeftMountainPath, mLeftMountainPaint);
 
-        Paint lmp2 = new Paint();
-        lmp2.setAntiAlias(true);
-        lmp2.setColor(Color.parseColor("#E6E6E8"));
-        //实例化路径
-        Path path2 = new Path();
-        path2.moveTo(left + lrdPoint + 10, right + lrmYpoint);// 此点为多边形的起点
-        path2.lineTo(left + lrdPoint + 10 + lrBanDis, right + lrmYpoint + lrBanGao);
-        path2.lineTo(left + lrdPoint + 10 - lrBanDis, right + lrmYpoint + lrBanGao);
-        path2.close(); // 使这些点构成封闭的多边形
-        canvas.drawPath(path2, lmp2);
+        // 右山
+        mRightMountainPath.reset();
+        mRightMountainPath.moveTo(left + lrdPoint + getValue(10), right + lrmYpoint);
+        mRightMountainPath.lineTo(left + lrdPoint + getValue(10) + lrBanDis, right + lrmYpoint + lrBanGao);
+        mRightMountainPath.lineTo(left + lrdPoint + getValue(10) - lrBanDis, right + lrmYpoint + lrBanGao);
+        mRightMountainPath.close();
+        canvas.drawPath(mRightMountainPath, mRightMountainPaint);
 
-        Paint mmp = new Paint();
-        mmp.setAntiAlias(true);
-        mmp.setColor(Color.WHITE);
-        //实例化路径
-        Path path3 = new Path();
-        path3.moveTo(left, right + down);// 此点为多边形的起点
-        path3.lineTo(left + getValue(200), right + down + mParentHeight / 2);
-        path3.lineTo(left - getValue(200), right + down + mParentHeight / 2);
-        path3.close(); // 使这些点构成封闭的多边形
-        canvas.drawPath(path3, mmp);
+        // 中山
+        mMidMountainPath.reset();
+        mMidMountainPath.moveTo(left, right + down);
+        mMidMountainPath.lineTo(left + getValue(200), right + down + mParentHeight / 2);
+        mMidMountainPath.lineTo(left - getValue(200), right + down + mParentHeight / 2);
+        mMidMountainPath.close();
+        canvas.drawPath(mMidMountainPath, mMidMountainPaint);
     }
 
+    /**
+     * 云
+     */
     private void drawYun(int w, int h) {
         mLeftCloudPath.reset();
-        mRightCloudPath.reset();
 
         float centerX = w / 2; //view's center x coordinate
         float minSize = Math.min(w, h); //get the min size
@@ -222,7 +219,6 @@ public class Scenery extends View {
         // 云的 最底下圆柱的半径
         float leftCloudBottomRoundRadius = leftCloudBottomHeight; //the bottom round radius of cloud
 
-//        float rightCloudTranslateX = leftCloudWidth * 2 / 3; //the distance of the cloud on the right
         float leftCloudEndX = (w - leftCloudWidth - leftCloudWidth * CLOUD_SCALE_RATIO / 2) / 2 + leftCloudWidth; //the left cloud end x coordinate
 //        float leftCloudEndY = (h / 3) + getValue(318); //clouds' end y coordinate
         float leftCloudEndY = (h / 3) + getValue(342); //clouds' end y coordinate
@@ -243,29 +239,7 @@ public class Scenery extends View {
         // 左边的云
         mLeftCloudPath.addCircle(leftCloudLeftTopCenterX - getValue(32), leftCloudTopCenterY + getValue(16), leftCloudBottomRoundRadius / 2, Path.Direction.CW);
 
-        //************************compute right cloud**********************
-        //The cloud on the right is CLOUD_SCALE_RATIO size of the left
-//        float rightCloudCenterX = rightCloudTranslateX + centerX - leftCloudWidth / 2; //the right cloud center x
-
-//        RectF calculateRect = new RectF();
-//        mLeftCloudPath.computeBounds(calculateRect, false); //compute the left cloud's path bounds
-
-//        mComputeMatrix.reset();
-//        mComputeMatrix.preTranslate(rightCloudTranslateX, -calculateRect.height() * (1 - CLOUD_SCALE_RATIO) / 2);
-//        mComputeMatrix.postScale(CLOUD_SCALE_RATIO, CLOUD_SCALE_RATIO, rightCloudCenterX, leftCloudEndY);
-//        mLeftCloudPath.transform(mComputeMatrix, mRightCloudPath);
-
-//        float left = calculateRect.left + leftCloudBottomRoundRadius;
-//        mRightCloudPath.computeBounds(calculateRect, false); //compute the right cloud's path bounds
-
-//        float right = calculateRect.right;
-//        float top = calculateRect.bottom;
-        //************************compute right cloud**********************
-//        mRainRect.set(left, top, right, h * 3 / 4f); //compute the rect of rain...
-//        mRainClipRect.set(0, mRainRect.top, w, mRainRect.bottom);
-
         mMaxTranslationX = leftCloudBottomRoundRadius / 2;
-//        setupAnimator();
     }
 
 
@@ -274,8 +248,6 @@ public class Scenery extends View {
      */
     public void setupAnimator() {
         mLeftCloudAnimatorPlayTime = 0;
-        mRightCloudAnimatorPlayTime = 0;
-
 //        mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
         mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
         mLeftCloudAnimator.setDuration(1500);
@@ -288,22 +260,14 @@ public class Scenery extends View {
                 invalidate();
             }
         });
-
-        mRightCloudAnimator = ValueAnimator.ofFloat(1, 0f);
-        mRightCloudAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        mRightCloudAnimator.setDuration(800);
-        mRightCloudAnimator.setInterpolator(new LinearInterpolator());
-        mRightCloudAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        mRightCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mLeftCloudAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mRightCloudAnimatorValue = (float) animation.getAnimatedValue();
-                invalidate();
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
             }
         });
 
         mLeftCloudAnimator.start();
-//        mRightCloudAnimator.start();
     }
 
     /**
