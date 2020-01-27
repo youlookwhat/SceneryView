@@ -37,8 +37,8 @@ public class Scenery extends View {
     private Paint mMidMountainPaint;
 
     private ValueAnimator mLeftCloudAnimator;
-    private ValueAnimator mLeftRightMouCloudAnimator;
-    private ValueAnimator mMidMouCloudAnimator;
+    private ValueAnimator mLeftRightMouAnimator;
+    private ValueAnimator mMidMouAnimator;
 
     private long mLeftCloudAnimatorPlayTime;
 
@@ -280,27 +280,30 @@ public class Scenery extends View {
         mMaxTranslationX = leftCloudBottomRoundRadius / 2;
     }
 
-
     public void playAnimator() {
-        setupAnimator();
-        setLeftRightMouAnimator();
-        setMidMouAnimator();
-//        postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                setMidMouAnimator();
-//            }
-//        }, 200);
+        playAnimator(true);
+    }
+
+    private void playAnimator(boolean isFirst) {
+        setupAnimator(isFirst);
+        setLeftRightMouAnimator(isFirst);
+        setMidMouAnimator(isFirst);
     }
 
     /**
      * 设置云的动画
      */
-    public void setupAnimator() {
-        mLeftCloudAnimatorPlayTime = 0;
-        mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
-//        mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
-        mLeftCloudAnimator.setDuration(1500);
+    public void setupAnimator(boolean isFirst) {
+        if (isFirst) {
+            mLeftCloudAnimatorPlayTime = 0;
+            mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
+            mLeftCloudAnimator.setDuration(1500);
+            mLeftCloudAnimator.setStartDelay(0);
+        } else {
+            mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
+            mLeftCloudAnimator.setDuration(1500);
+            mLeftCloudAnimator.setStartDelay(200);
+        }
         mLeftCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 //        mLeftCloudAnimator.setRepeatMode(ValueAnimator.REVERSE);
         mLeftCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -322,33 +325,61 @@ public class Scenery extends View {
     }
 
 
-    public void setLeftRightMouAnimator() {
-        mLeftRightMouCloudAnimator = ValueAnimator.ofFloat(0, -1, 10);
-        mLeftRightMouCloudAnimator.setDuration(1500);
-        mLeftRightMouCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        mLeftRightMouCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+    public void setLeftRightMouAnimator(boolean isFirst) {
+        if (isFirst) {
+            mLeftRightMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
+            mLeftRightMouAnimator.setDuration(1500);
+            mLeftRightMouAnimator.setStartDelay(0);
+        } else {
+            mLeftRightMouAnimator = ValueAnimator.ofFloat(10, 0);
+            mLeftRightMouAnimator.setDuration(1500);
+            mLeftRightMouAnimator.setStartDelay(200);
+        }
+        mLeftRightMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        mLeftRightMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 mLeftRightMouAnimatorValue = (float) animation.getAnimatedValue();
                 invalidate();
             }
         });
-        mLeftRightMouCloudAnimator.start();
+        mLeftRightMouAnimator.start();
     }
 
-    public void setMidMouAnimator() {
-        mMidMouCloudAnimator = ValueAnimator.ofFloat(0, -1, 10);
-        mMidMouCloudAnimator.setDuration(1500);
-        mMidMouCloudAnimator.setStartDelay(200);
-        mMidMouCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        mMidMouCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+    public void setMidMouAnimator(final boolean isFirst) {
+        if (isFirst) {
+            mMidMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
+            mMidMouAnimator.setDuration(1500);
+            mMidMouAnimator.setStartDelay(200);
+        } else {
+            mMidMouAnimator = ValueAnimator.ofFloat(10, 0);
+            mMidMouAnimator.setDuration(1500);
+            mMidMouAnimator.setStartDelay(0);
+        }
+
+        mMidMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        mMidMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 mMidMouAnimatorValue = (float) animation.getAnimatedValue();
                 invalidate();
             }
         });
-        mMidMouCloudAnimator.start();
+        mMidMouAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (isFirst) {
+                    postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            playAnimator(false);
+                        }
+                    }, 100);
+                }
+            }
+        });
+        mMidMouAnimator.start();
     }
 
 
