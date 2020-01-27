@@ -11,14 +11,29 @@
         android:id="@+id/rl_header"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="50dp"
         android:background="@drawable/shape_view_box"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <me.jingbin.library.Scenery
+            android:id="@+id/scenery_icon"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_centerInParent="true"
+            android:layout_margin="20dp" />
 
     </RelativeLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/bt_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始"
+        android:onClick="start"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -29,8 +44,9 @@
         app:layout_constraintTop_toBottomOf="@+id/rl_header">
 
         <me.jingbin.library.Scenery
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:id="@+id/scenery"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
             android:layout_centerInParent="true"
             android:layout_margin="20dp" />
     </RelativeLayout>

@@ -11,6 +11,7 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 
 /**
@@ -79,7 +80,6 @@ public class Scenery extends View {
 
         sunWidth = getValue(70);
         Log.e("Scenery", "width = " + getWidth() + "， height = " + getHeight());
-//        drawYun(w, h);
         drawYun(getWidth() + getValue(200), getHeight());
     }
 
@@ -137,7 +137,7 @@ public class Scenery extends View {
         canvas.drawCircle((mParentWidth / 2) - getValue(90), (mParentHeight / 2) - getValue(80), sunWidth / 2, sunP);
 
         // 三座山
-        drawMo(canvas, mParentWidth / 2, (mParentHeight / 2) - 10, 10);
+        drawMo(canvas, mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
 
 //        canvas.save();
 //        canvas.clipRect(mRainClipRect);
@@ -165,13 +165,13 @@ public class Scenery extends View {
      */
     private void drawMo(Canvas canvas, int left, int right, int down) {
         // 左右山 Y坐标相对于中心点下移多少
-        int lrmYpoint = down + 30;
+        int lrmYpoint = down + getValue(30);
         // 左右山 X坐标相对于中心点左移或右移多少
-        int lrdPoint = 120;
+        int lrdPoint = getValue(120);
         // 左右山 山的一半的X间距是多少
-        int lrBanDis = 130;
+        int lrBanDis = getValue(140);
         // 中间山 山的一半的X间距是多少
-        int midMoDis = 200;
+        int lrBanGao = getValue(150);
 
         Paint lmp = new Paint();
         lmp.setAntiAlias(true);
@@ -179,8 +179,8 @@ public class Scenery extends View {
         //实例化路径
         Path path = new Path();
         path.moveTo(left - lrdPoint, right + lrmYpoint);
-        path.lineTo(left - lrdPoint + 130, right + lrmYpoint + 150);
-        path.lineTo(left - lrdPoint - 130, right + lrmYpoint + 150);
+        path.lineTo(left - lrdPoint + lrBanDis, right + lrmYpoint + lrBanGao);
+        path.lineTo(left - lrdPoint - lrBanDis, right + lrmYpoint + lrBanGao);
         path.close(); // 使这些点构成封闭的多边形
         canvas.drawPath(path, lmp);
 
@@ -190,8 +190,8 @@ public class Scenery extends View {
         //实例化路径
         Path path2 = new Path();
         path2.moveTo(left + lrdPoint + 10, right + lrmYpoint);// 此点为多边形的起点
-        path2.lineTo(left + lrdPoint + 10 + 130, right + lrmYpoint + 150);
-        path2.lineTo(left + lrdPoint + 10 - 130, right + lrmYpoint + 150);
+        path2.lineTo(left + lrdPoint + 10 + lrBanDis, right + lrmYpoint + lrBanGao);
+        path2.lineTo(left + lrdPoint + 10 - lrBanDis, right + lrmYpoint + lrBanGao);
         path2.close(); // 使这些点构成封闭的多边形
         canvas.drawPath(path2, lmp2);
 
@@ -201,8 +201,8 @@ public class Scenery extends View {
         //实例化路径
         Path path3 = new Path();
         path3.moveTo(left, right + down);// 此点为多边形的起点
-        path3.lineTo(left + 200, right + down + 220);
-        path3.lineTo(left - 200, right + down + 220);
+        path3.lineTo(left + getValue(200), right + down + mParentHeight / 2);
+        path3.lineTo(left - getValue(200), right + down + mParentHeight / 2);
         path3.close(); // 使这些点构成封闭的多边形
         canvas.drawPath(path3, mmp);
     }
@@ -211,21 +211,22 @@ public class Scenery extends View {
         mLeftCloudPath.reset();
         mRightCloudPath.reset();
 
-
         float centerX = w / 2; //view's center x coordinate
         float minSize = Math.min(w, h); //get the min size
 
         // 云的宽度
-        float leftCloudWidth = minSize / 2f; //the width of cloud
+//        float leftCloudWidth = minSize / 2f; //the width of cloud
+        float leftCloudWidth = minSize / 1.4f; //the width of cloud
         // 云的 最底下圆柱的高度
         float leftCloudBottomHeight = leftCloudWidth / 3f; //the bottom height of cloud
         // 云的 最底下圆柱的半径
         float leftCloudBottomRoundRadius = leftCloudBottomHeight; //the bottom round radius of cloud
 
 //        float rightCloudTranslateX = leftCloudWidth * 2 / 3; //the distance of the cloud on the right
-        float leftCloudEndX = (w - leftCloudWidth - leftCloudWidth * CLOUD_SCALE_RATIO / 2) / 2 + leftCloudWidth + 12; //the left cloud end x coordinate
-        float leftCloudEndY = (h / 3) + 320; //clouds' end y coordinate
-//        float leftCloudEndY = (h / 3); //clouds' end y coordinate
+        float leftCloudEndX = (w - leftCloudWidth - leftCloudWidth * CLOUD_SCALE_RATIO / 2) / 2 + leftCloudWidth; //the left cloud end x coordinate
+//        float leftCloudEndY = (h / 3) + getValue(318); //clouds' end y coordinate
+        float leftCloudEndY = (h / 3) + getValue(342); //clouds' end y coordinate
+//        float leftCloudEndY = (h / 3)+getValue(100); //clouds' end y coordinate
 
         //add the bottom round rect
         mLeftCloudPath.addRoundRect(new RectF(leftCloudEndX - leftCloudWidth, leftCloudEndY - leftCloudBottomHeight,
@@ -236,11 +237,11 @@ public class Scenery extends View {
         float leftCloudLeftTopCenterX = leftCloudEndX - leftCloudWidth + leftCloudBottomRoundRadius;
 
         // 最右边的云
-        mLeftCloudPath.addCircle(leftCloudRightTopCenterX, leftCloudTopCenterY, leftCloudBottomRoundRadius * 3 / 4, Path.Direction.CW);
+        mLeftCloudPath.addCircle(leftCloudRightTopCenterX + getValue(12), leftCloudTopCenterY + getValue(14), leftCloudBottomRoundRadius * 3 / 4, Path.Direction.CW);
         // 中间的云
-        mLeftCloudPath.addCircle((leftCloudRightTopCenterX + leftCloudLeftTopCenterX - 17) / 2 - 10, leftCloudTopCenterY - 10, 10, Path.Direction.CW);
+        mLeftCloudPath.addCircle((leftCloudRightTopCenterX + leftCloudLeftTopCenterX - getValue(23)) / 2 - getValue(10), leftCloudTopCenterY - getValue(0), leftCloudBottomRoundRadius / 7, Path.Direction.CW);
         // 左边的云
-        mLeftCloudPath.addCircle(leftCloudLeftTopCenterX - 21, leftCloudTopCenterY + 10, leftCloudBottomRoundRadius / 2, Path.Direction.CW);
+        mLeftCloudPath.addCircle(leftCloudLeftTopCenterX - getValue(32), leftCloudTopCenterY + getValue(16), leftCloudBottomRoundRadius / 2, Path.Direction.CW);
 
         //************************compute right cloud**********************
         //The cloud on the right is CLOUD_SCALE_RATIO size of the left
@@ -271,16 +272,14 @@ public class Scenery extends View {
     /**
      * 设置云的动画
      */
-    private void setupAnimator() {
+    public void setupAnimator() {
         mLeftCloudAnimatorPlayTime = 0;
         mRightCloudAnimatorPlayTime = 0;
 
 //        mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
-        mLeftCloudAnimator = ValueAnimator.ofFloat(-10, 0);
-//        mLeftCloudAnimator.setRepeatCount(ValueAnimator.INFINITE);
-//        mLeftCloudAnimator.setRepeatCount(1);
-        mLeftCloudAnimator.setDuration(1000);
-        mLeftCloudAnimator.setInterpolator(new LinearInterpolator());
+        mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
+        mLeftCloudAnimator.setDuration(1500);
+        mLeftCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 //        mLeftCloudAnimator.setRepeatMode(ValueAnimator.REVERSE);
         mLeftCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
