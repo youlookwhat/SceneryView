@@ -31,20 +31,31 @@ public class Scenery extends View {
     private Path mRightMountainPath;  // the right mountain's path
     private Path mMidMountainPath;    // the mid mountain's path
     private final static float CLOUD_SCALE_RATIO = 0.85f;
-    private Matrix mComputeMatrix = new Matrix(); //The matrix for computing
-
-    private float mMaxTranslationX; //The max translation x when do animation.
-    private float mLeftCloudAnimatorValue; //The left cloud animator value
-    private Path mComputePath = new Path(); //The path for computing
     private Paint mLeftCloudPaint;
     private Paint mLeftMountainPaint;
     private Paint mRightMountainPaint;
     private Paint mMidMountainPaint;
 
     private ValueAnimator mLeftCloudAnimator;
+    private ValueAnimator mLeftRightMouCloudAnimator;
+    private ValueAnimator mMidMouCloudAnimator;
 
     private long mLeftCloudAnimatorPlayTime;
 
+    // 云朵
+    private float mMaxTranslationX; //The max translation x when do animation.
+    private float mLeftCloudAnimatorValue; //The left cloud animator value
+    private Matrix mComputeMatrix = new Matrix(); //The matrix for computing
+    private Path mComputePath = new Path(); //The path for computing
+
+    // 左右山的值
+    private float mMaxLeftRightTranslationY;
+    private float mLeftRightMouAnimatorValue;
+    private float mMidMouAnimatorValue;
+    private Matrix mComputeMatrix2 = new Matrix(); //The matrix for computing
+    private Matrix mComputeMatrix3 = new Matrix(); //The matrix for computing
+    private Path mComputePath2 = new Path();
+    private Path mComputePath3 = new Path();
 
     public Scenery(Context context) {
         this(context, null);
@@ -72,6 +83,7 @@ public class Scenery extends View {
 
         sunWidth = getValue(70);
         Log.e("onSizeChanged", "width = " + getWidth() + "， height = " + getHeight());
+        drawMo(mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
         drawYun(getWidth() + getValue(200), getHeight());
     }
 
@@ -139,7 +151,7 @@ public class Scenery extends View {
         canvas.drawCircle((mParentWidth / 2) - getValue(90), (mParentHeight / 2) - getValue(80), sunWidth / 2, sunP);
 
         // 三座山
-        drawMo(canvas, mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
+//        drawMo(canvas, mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
 
 //        canvas.save();
 //        canvas.clipRect(mRainClipRect);
@@ -151,11 +163,26 @@ public class Scenery extends View {
 //        mRightCloudPath.transform(mComputeMatrix, mComputePath);
 //        canvas.drawPath(mComputePath, mRightCloudPaint);
 
+
+        mComputeMatrix2.reset();
+        mComputeMatrix2.postTranslate(0, mMaxLeftRightTranslationY * mLeftRightMouAnimatorValue);
+        mLeftMountainPath.transform(mComputeMatrix2, mComputePath2);
+        canvas.drawPath(mComputePath2, mLeftMountainPaint);
+        mRightMountainPath.transform(mComputeMatrix2, mComputePath2);
+        canvas.drawPath(mComputePath2, mRightMountainPaint);
+
+        mComputeMatrix3.reset();
+        mComputeMatrix3.postTranslate(0, mMaxLeftRightTranslationY * mMidMouAnimatorValue);
+        mMidMountainPath.transform(mComputeMatrix3, mComputePath3);
+        canvas.drawPath(mComputePath3, mMidMountainPaint);
+
+//        mMidMountainPath.transform(mComputeMatrix2, mComputePath2);
+//        canvas.drawPath(mComputePath2, mMidMountainPaint);
+
         mComputeMatrix.reset();
         mComputeMatrix.postTranslate(mMaxTranslationX * mLeftCloudAnimatorValue, 0);
         mLeftCloudPath.transform(mComputeMatrix, mComputePath);
         canvas.drawPath(mComputePath, mLeftCloudPaint);
-
 //        canvas.restore();
     }
 
@@ -165,6 +192,10 @@ public class Scenery extends View {
      * @param left  中心点左坐标
      * @param right 中心点右坐标
      */
+    private void drawMo(int left, int right, int down) {
+        drawMo(null, left, right, down);
+    }
+
     private void drawMo(Canvas canvas, int left, int right, int down) {
         // 左右山 Y坐标相对于中心点下移多少
         int lrmYpoint = down + getValue(30);
@@ -183,23 +214,30 @@ public class Scenery extends View {
         mLeftMountainPath.lineTo(left - lrdPoint - lrBanDis, right + lrmYpoint + lrBanGao);
         // 使这些点构成封闭的多边形
         mLeftMountainPath.close();
-        canvas.drawPath(mLeftMountainPath, mLeftMountainPaint);
-
+        if (canvas != null) {
+            canvas.drawPath(mLeftMountainPath, mLeftMountainPaint);
+        }
         // 右山
         mRightMountainPath.reset();
         mRightMountainPath.moveTo(left + lrdPoint + getValue(10), right + lrmYpoint);
         mRightMountainPath.lineTo(left + lrdPoint + getValue(10) + lrBanDis, right + lrmYpoint + lrBanGao);
         mRightMountainPath.lineTo(left + lrdPoint + getValue(10) - lrBanDis, right + lrmYpoint + lrBanGao);
         mRightMountainPath.close();
-        canvas.drawPath(mRightMountainPath, mRightMountainPaint);
+        if (canvas != null) {
+            canvas.drawPath(mRightMountainPath, mRightMountainPaint);
+        }
 
         // 中山
         mMidMountainPath.reset();
         mMidMountainPath.moveTo(left, right + down);
-        mMidMountainPath.lineTo(left + getValue(200), right + down + mParentHeight / 2);
-        mMidMountainPath.lineTo(left - getValue(200), right + down + mParentHeight / 2);
+        mMidMountainPath.lineTo(left + getValue(220), right + down + mParentHeight / 2 + mParentHeight / 14);
+        mMidMountainPath.lineTo(left - getValue(220), right + down + mParentHeight / 2 + mParentHeight / 14);
         mMidMountainPath.close();
-        canvas.drawPath(mMidMountainPath, mMidMountainPaint);
+        if (canvas != null) {
+            canvas.drawPath(mMidMountainPath, mMidMountainPaint);
+        }
+
+        mMaxLeftRightTranslationY = (right + down + mParentHeight / 2) / 14;
     }
 
     /**
@@ -243,13 +281,25 @@ public class Scenery extends View {
     }
 
 
+    public void playAnimator() {
+        setupAnimator();
+        setLeftRightMouAnimator();
+        setMidMouAnimator();
+//        postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                setMidMouAnimator();
+//            }
+//        }, 200);
+    }
+
     /**
      * 设置云的动画
      */
     public void setupAnimator() {
         mLeftCloudAnimatorPlayTime = 0;
-//        mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
-        mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
+        mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
+//        mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
         mLeftCloudAnimator.setDuration(1500);
         mLeftCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 //        mLeftCloudAnimator.setRepeatMode(ValueAnimator.REVERSE);
@@ -268,7 +318,39 @@ public class Scenery extends View {
         });
 
         mLeftCloudAnimator.start();
+
     }
+
+
+    public void setLeftRightMouAnimator() {
+        mLeftRightMouCloudAnimator = ValueAnimator.ofFloat(0, -1, 10);
+        mLeftRightMouCloudAnimator.setDuration(1500);
+        mLeftRightMouCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        mLeftRightMouCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mLeftRightMouAnimatorValue = (float) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
+        mLeftRightMouCloudAnimator.start();
+    }
+
+    public void setMidMouAnimator() {
+        mMidMouCloudAnimator = ValueAnimator.ofFloat(0, -1, 10);
+        mMidMouCloudAnimator.setDuration(1500);
+        mMidMouCloudAnimator.setStartDelay(200);
+        mMidMouCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        mMidMouCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mMidMouAnimatorValue = (float) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
+        mMidMouCloudAnimator.start();
+    }
+
 
     /**
      * 得到父布局为 150dp 时的值

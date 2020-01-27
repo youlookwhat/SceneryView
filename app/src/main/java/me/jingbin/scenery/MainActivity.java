@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     public void start(View view) {
         Scenery scenery_icon = findViewById(R.id.scenery_icon);
         Scenery scenery = findViewById(R.id.scenery);
-        scenery_icon.setupAnimator();
-        scenery.setupAnimator();
+        scenery_icon.playAnimator();
+//        scenery.playAnimator();
     }
 }
