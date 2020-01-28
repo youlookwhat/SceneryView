@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SceneryView">
+        <!--The color of sun-->
+        <attr name="sun_color" format="color" />
+        <!--The color of the cloud-->
+        <attr name="cloud_color" format="color" />
+        <!--The color of the left mountain-->
+        <attr name="left_mountain_color" format="color" />
+        <!--The color of the right mountain-->
+        <attr name="right_mountain_color" format="color" />
+        <!--The color of the middle mountain-->
+        <attr name="mid_mountain_color" format="color" />
+        <!--The color of the background-->
+        <attr name="background_color" format="color" />
+    </declare-styleable>
+</resources>

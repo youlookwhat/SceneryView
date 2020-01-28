@@ -1,5 +1,6 @@
 package me.jingbin.scenery;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 
@@ -17,9 +18,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void start(View view) {
-        SceneryView scenery_icon = findViewById(R.id.scenery_icon);
+        SceneryView sceneryIcon = findViewById(R.id.scenery_icon);
         SceneryView scenery = findViewById(R.id.scenery);
-        scenery_icon.playAnimator();
-        scenery.playAnimator();
+        sceneryIcon.playAnimator();
+        scenery.setColorBackground(Color.GRAY).setSunColor(Color.RED).playAnimator();
     }
 }

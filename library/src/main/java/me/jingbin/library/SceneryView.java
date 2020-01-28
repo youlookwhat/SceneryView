@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -24,6 +25,11 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 public class SceneryView extends View {
 
     private final static float CLOUD_SCALE_RATIO = 0.85f;
+    private final static int DEFAULT_SUN_COLOR = Color.YELLOW;
+    private final static int DEFAULT_LEFT_RIGHT_MOU_COLOR = Color.parseColor("#E6E6E8");
+    private final static int DEFAULT_MIDDLE_MOU_COLOR = Color.WHITE;
+    private final static int DEFAULT_BACKGROUND_COLOR = Color.parseColor("#6ABDE8");
+    private final static int DEFAULT_CLOUD_COLOR = Color.parseColor("#B6C4F3");
     private int mParentWidth = 394;
     private int mParentHeight = 394;
     private int mSunWidth;
@@ -31,6 +37,7 @@ public class SceneryView extends View {
     private int mSunAnimX;
     private int mSunAnimY;
     private int[] mSunAnimXY;
+    private boolean mIsStart = false;
 
     private float mMaxCloudTranslationX;
     private float mMaxLeftRightMouTranslationY;
@@ -45,6 +52,7 @@ public class SceneryView extends View {
     private Path mMidMountainPath;
     private Path mSunPath;
 
+    private Paint backgroundPaint;
     private Paint mCloudPaint;
     private Paint mLeftMountainPaint;
     private Paint mRightMountainPaint;
@@ -59,6 +67,13 @@ public class SceneryView extends View {
     private Path mComputePath2 = new Path();
     private Path mComputePath3 = new Path();
     private Path mComputePath4 = new Path();
+
+    private int mSunColor = DEFAULT_SUN_COLOR;
+    private int mLeftMouColor = DEFAULT_LEFT_RIGHT_MOU_COLOR;
+    private int mRightMouColor = DEFAULT_LEFT_RIGHT_MOU_COLOR;
+    private int mMidMouColor = DEFAULT_MIDDLE_MOU_COLOR;
+    private int mCloudColor = DEFAULT_CLOUD_COLOR;
+    private int mBackgroundColor = DEFAULT_BACKGROUND_COLOR;
 
     public SceneryView(Context context) {
         this(context, null);
@@ -77,6 +92,70 @@ public class SceneryView extends View {
         init();
     }
 
+    private void initAttrs(Context context, AttributeSet attrs) {
+        if (attrs == null) {
+            return;
+        }
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SceneryView);
+        mSunColor = typedArray.getColor(R.styleable.SceneryView_sun_color, DEFAULT_SUN_COLOR);
+        mLeftMouColor = typedArray.getColor(R.styleable.SceneryView_left_mountain_color, DEFAULT_LEFT_RIGHT_MOU_COLOR);
+        mRightMouColor = typedArray.getColor(R.styleable.SceneryView_right_mountain_color, DEFAULT_LEFT_RIGHT_MOU_COLOR);
+        mMidMouColor = typedArray.getColor(R.styleable.SceneryView_mid_mountain_color, DEFAULT_MIDDLE_MOU_COLOR);
+        mCloudColor = typedArray.getColor(R.styleable.SceneryView_cloud_color, DEFAULT_CLOUD_COLOR);
+        mBackgroundColor = typedArray.getColor(R.styleable.SceneryView_background_color, DEFAULT_BACKGROUND_COLOR);
+        typedArray.recycle();
+    }
+
+    private void init() {
+        mCloudPath = new Path();
+        mLeftMountainPath = new Path();
+        mRightMountainPath = new Path();
+        mMidMountainPath = new Path();
+        mSunPath = new Path();
+
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
+
+        mCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mCloudPaint.setColor(mCloudColor);
+        // 中间重复的覆盖
+        mCloudPaint.setAntiAlias(true);
+        mCloudPaint.setStyle(Paint.Style.FILL);
+
+        // 背景
+        backgroundPaint = new Paint();
+        // 自定义颜色
+        backgroundPaint.setColor(mBackgroundColor);
+        // 设置画笔的锯齿效果
+        backgroundPaint.setAntiAlias(true);
+
+        mLeftMountainPaint = new Paint();
+        mLeftMountainPaint.setAntiAlias(true);
+        mLeftMountainPaint.setColor(mLeftMouColor);
+
+        mRightMountainPaint = new Paint();
+        mRightMountainPaint.setAntiAlias(true);
+        mRightMountainPaint.setColor(mRightMouColor);
+
+        mMidMountainPaint = new Paint();
+        mMidMountainPaint.setAntiAlias(true);
+        mMidMountainPaint.setColor(mMidMouColor);
+
+        mSunPaint = new Paint();
+        mSunPaint.setColor(mSunColor);
+        mSunPaint.setAntiAlias(true);
+    }
+
+    /**
+     * start animator
+     */
+    public void playAnimator() {
+        if (!mIsStart) {
+            mIsStart = true;
+            playCloudMouAnimator(true);
+            setSunAnimator();
+        }
+    }
+
     // 获取View宽高
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -90,41 +169,6 @@ public class SceneryView extends View {
         drawSun();
     }
 
-    private void init() {
-        mCloudPath = new Path();
-        mLeftMountainPath = new Path();
-        mRightMountainPath = new Path();
-        mMidMountainPath = new Path();
-        mSunPath = new Path();
-
-        setLayerType(LAYER_TYPE_SOFTWARE, null);
-
-        mCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mCloudPaint.setColor(Color.parseColor("#B6C4F3"));
-        // 中间重复的覆盖
-        mCloudPaint.setAntiAlias(true);
-        mCloudPaint.setStyle(Paint.Style.FILL);
-
-        mLeftMountainPaint = new Paint();
-        mLeftMountainPaint.setAntiAlias(true);
-        mLeftMountainPaint.setColor(Color.parseColor("#E6E6E8"));
-
-        mRightMountainPaint = new Paint();
-        mRightMountainPaint.setAntiAlias(true);
-        mRightMountainPaint.setColor(Color.parseColor("#E6E6E8"));
-
-        mMidMountainPaint = new Paint();
-        mMidMountainPaint.setAntiAlias(true);
-        mMidMountainPaint.setColor(Color.WHITE);
-
-        mSunPaint = new Paint();
-        mSunPaint.setColor(Color.YELLOW);
-        mSunPaint.setAntiAlias(true);
-    }
-
-    private void initAttrs(Context context, AttributeSet attrs) {
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         // 圆框
@@ -135,14 +179,7 @@ public class SceneryView extends View {
         super.onDraw(canvas);
         Log.e("Scenery", "onDraw： " + "width = " + getWidth() + "， height = " + getHeight());
 
-        // 背景
-        Paint p = new Paint();
-        // 自定义颜色
-        p.setColor(Color.parseColor("#6ABDE8"));
-        // 设置画笔的锯齿效果
-        p.setAntiAlias(true);
-        // 画圆
-        canvas.drawCircle(mParentWidth / 2, mParentHeight / 2, mParentWidth / 2, p);
+        canvas.drawCircle(mParentWidth / 2, mParentHeight / 2, mParentWidth / 2, backgroundPaint);
 
         // 太阳
 //        canvas.drawCircle((mParentWidth / 2) - getValue(90), (mParentHeight / 2) - getValue(80), sunWidth / 2, mSunPaint);
@@ -275,14 +312,6 @@ public class SceneryView extends View {
     }
 
     /**
-     * start animator
-     */
-    public void playAnimator() {
-        playCloudMouAnimator(true);
-        setSunAnimator();
-    }
-
-    /**
      * 开始云和左右两边山的动画
      *
      * @param isFirst 是否第一次播放
@@ -401,6 +430,13 @@ public class SceneryView extends View {
                 invalidate();
             }
         });
+        mSunAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                mIsStart = false;
+            }
+        });
         mSunAnimator.start();
     }
 
@@ -431,5 +467,48 @@ public class SceneryView extends View {
         return new int[]{x, y};
     }
 
+    /**
+     * Set the color of the background
+     */
+    public SceneryView setColorBackground(int colorBackground) {
+        this.mBackgroundColor = colorBackground;
+        backgroundPaint.setColor(mBackgroundColor);
+        postInvalidate();
+        return this;
+    }
 
+    public SceneryView setSunColor(int sunColor) {
+        this.mSunColor = sunColor;
+        mSunPaint.setColor(mSunColor);
+        postInvalidate();
+        return this;
+    }
+
+    public SceneryView setLeftMouColor(int leftMouColor) {
+        this.mLeftMouColor = leftMouColor;
+        mLeftMountainPaint.setColor(mLeftMouColor);
+        postInvalidate();
+        return this;
+    }
+
+    public SceneryView setRightMouColor(int rightMouColor) {
+        this.mRightMouColor = rightMouColor;
+        mRightMountainPaint.setColor(mRightMouColor);
+        postInvalidate();
+        return this;
+    }
+
+    public SceneryView setMidMouColor(int midMouColor) {
+        this.mMidMouColor = midMouColor;
+        mMidMountainPaint.setColor(mMidMouColor);
+        postInvalidate();
+        return this;
+    }
+
+    public SceneryView setCloudColor(int cloudColor) {
+        this.mCloudColor = cloudColor;
+        mCloudPaint.setColor(mCloudColor);
+        postInvalidate();
+        return this;
+    }
 }
