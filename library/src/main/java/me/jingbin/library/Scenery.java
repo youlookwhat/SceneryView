@@ -17,7 +17,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 /**
  * 风景View
- * 2020-01-01 11:51
+ * 2020-01-01 11:51 ，历时四个半天，基本完成
  *
  * @author jingbin
  */
@@ -25,22 +25,24 @@ public class Scenery extends View {
 
     private int mParentWidth = 394;
     private int mParentHeight = 394;
-    private int sunWidth = 70;
-    private Path mLeftCloudPath;      // the cloud's path
+    private int mSunWidth;
+    private int mSunAnimCircle;
+    private int mSunAnimX;
+    private int mSunAnimY;
+    private int[] mSunAnimXY;
+
+    private Path mCloudPath;          // the cloud's path
     private Path mLeftMountainPath;   // the left mountain's path
     private Path mRightMountainPath;  // the right mountain's path
     private Path mMidMountainPath;    // the mid mountain's path
+    private Path mSunPath;            // the  sun's path
+
     private final static float CLOUD_SCALE_RATIO = 0.85f;
-    private Paint mLeftCloudPaint;
+    private Paint mCloudPaint;
     private Paint mLeftMountainPaint;
     private Paint mRightMountainPaint;
     private Paint mMidMountainPaint;
-
-    private ValueAnimator mLeftCloudAnimator;
-    private ValueAnimator mLeftRightMouAnimator;
-    private ValueAnimator mMidMouAnimator;
-
-    private long mLeftCloudAnimatorPlayTime;
+    private Paint mSunPaint;
 
     // 云朵
     private float mMaxTranslationX; //The max translation x when do animation.
@@ -48,14 +50,17 @@ public class Scenery extends View {
     private Matrix mComputeMatrix = new Matrix(); //The matrix for computing
     private Path mComputePath = new Path(); //The path for computing
 
-    // 左右山的值
     private float mMaxLeftRightTranslationY;
     private float mLeftRightMouAnimatorValue;
     private float mMidMouAnimatorValue;
-    private Matrix mComputeMatrix2 = new Matrix(); //The matrix for computing
-    private Matrix mComputeMatrix3 = new Matrix(); //The matrix for computing
+    private float mSunAnimatorValue = -120;
+
+    private Matrix mComputeMatrix2 = new Matrix();
+    private Matrix mComputeMatrix3 = new Matrix();
+    private Matrix mComputeMatrix4 = new Matrix();
     private Path mComputePath2 = new Path();
     private Path mComputePath3 = new Path();
+    private Path mComputePath4 = new Path();
 
     public Scenery(Context context) {
         this(context, null);
@@ -81,25 +86,26 @@ public class Scenery extends View {
         // 取宽高的最小值
         mParentWidth = mParentHeight = Math.min(getWidth(), getHeight());
 
-        sunWidth = getValue(70);
         Log.e("onSizeChanged", "width = " + getWidth() + "， height = " + getHeight());
         drawMo(mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
-        drawYun(getWidth() + getValue(200), getHeight());
+        drawYun(mParentWidth + getValue(200), mParentHeight);
+        drawSun();
     }
 
     private void init() {
-        mLeftCloudPath = new Path();
+        mCloudPath = new Path();
         mLeftMountainPath = new Path();
         mRightMountainPath = new Path();
         mMidMountainPath = new Path();
+        mSunPath = new Path();
 
         setLayerType(LAYER_TYPE_SOFTWARE, null);
 
-        mLeftCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mLeftCloudPaint.setColor(Color.parseColor("#B6C4F3"));
+        mCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mCloudPaint.setColor(Color.parseColor("#B6C4F3"));
         // 中间重复的覆盖
-        mLeftCloudPaint.setAntiAlias(true);
-        mLeftCloudPaint.setStyle(Paint.Style.FILL);
+        mCloudPaint.setAntiAlias(true);
+        mCloudPaint.setStyle(Paint.Style.FILL);
 
         mLeftMountainPaint = new Paint();
         mLeftMountainPaint.setAntiAlias(true);
@@ -113,9 +119,10 @@ public class Scenery extends View {
         mMidMountainPaint.setAntiAlias(true);
         mMidMountainPaint.setColor(Color.WHITE);
 
-//        mRightCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-//        mRightCloudPaint.setColor(Color.GRAY);
-//        mRightCloudPaint.setStyle(Paint.Style.FILL);
+        // 太阳
+        mSunPaint = new Paint();
+        mSunPaint.setColor(Color.YELLOW);
+        mSunPaint.setAntiAlias(true);
     }
 
     private void initAttrs(Context context, AttributeSet attrs) {
@@ -141,29 +148,20 @@ public class Scenery extends View {
         canvas.drawCircle(mParentWidth / 2, mParentHeight / 2, mParentWidth / 2, p);
 
         // 太阳
-        Paint sunP = new Paint();
-        // 自定义颜色
-//        sunP.setColor(Color.parseColor("#FFF589"));
-        sunP.setColor(Color.YELLOW);
-        // 设置画笔的锯齿效果
-        sunP.setAntiAlias(true);
-        // 画圆
-        canvas.drawCircle((mParentWidth / 2) - getValue(90), (mParentHeight / 2) - getValue(80), sunWidth / 2, sunP);
+//        canvas.drawCircle((mParentWidth / 2) - getValue(90), (mParentHeight / 2) - getValue(80), sunWidth / 2, mSunPaint);
 
         // 三座山
 //        drawMo(canvas, mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
 
-//        canvas.save();
-//        canvas.clipRect(mRainClipRect);
-//        drawRainDrops(canvas);
-//        canvas.restore();
+        // 太阳
+        mComputeMatrix4.reset();
+        // x y 坐标
+        int[] circleXY = getCircleXY(mSunAnimX, mSunAnimY, mSunAnimCircle, mSunAnimatorValue);
+        mComputeMatrix4.postTranslate(circleXY[0] - mSunAnimXY[0], circleXY[1] - mSunAnimXY[1]);
+        mSunPath.transform(mComputeMatrix4, mComputePath4);
+        canvas.drawPath(mComputePath4, mSunPaint);
 
-//        mComputeMatrix.reset();
-//        mComputeMatrix.postTranslate((mMaxTranslationX / 2) * mRightCloudAnimatorValue, 0);
-//        mRightCloudPath.transform(mComputeMatrix, mComputePath);
-//        canvas.drawPath(mComputePath, mRightCloudPaint);
-
-
+        // 左右的山
         mComputeMatrix2.reset();
         mComputeMatrix2.postTranslate(0, mMaxLeftRightTranslationY * mLeftRightMouAnimatorValue);
         mLeftMountainPath.transform(mComputeMatrix2, mComputePath2);
@@ -171,32 +169,43 @@ public class Scenery extends View {
         mRightMountainPath.transform(mComputeMatrix2, mComputePath2);
         canvas.drawPath(mComputePath2, mRightMountainPaint);
 
+        // 中间的山
         mComputeMatrix3.reset();
         mComputeMatrix3.postTranslate(0, mMaxLeftRightTranslationY * mMidMouAnimatorValue);
         mMidMountainPath.transform(mComputeMatrix3, mComputePath3);
         canvas.drawPath(mComputePath3, mMidMountainPaint);
 
-//        mMidMountainPath.transform(mComputeMatrix2, mComputePath2);
-//        canvas.drawPath(mComputePath2, mMidMountainPaint);
-
+        // 云朵
         mComputeMatrix.reset();
         mComputeMatrix.postTranslate(mMaxTranslationX * mLeftCloudAnimatorValue, 0);
-        mLeftCloudPath.transform(mComputeMatrix, mComputePath);
-        canvas.drawPath(mComputePath, mLeftCloudPaint);
+        mCloudPath.transform(mComputeMatrix, mComputePath);
+        canvas.drawPath(mComputePath, mCloudPaint);
 //        canvas.restore();
+    }
+
+    private void drawSun() {
+        // sun图形的直径
+        mSunWidth = getValue(70);
+        // sun图形的半径
+        int sunCircle = mSunWidth / 2;
+        // sun动画半径 = (sun半径 + 80(sun距离中心点的高度) + 整个View的半径 + sun半径 + 20(sun距离整个View的最下沿的间距)) / 2
+        mSunAnimCircle = (mSunWidth + getValue(100) + mParentWidth / 2) / 2;
+        // sun动画的圆心x坐标
+        mSunAnimX = mParentWidth / 2;
+        // sun动画的圆心y坐标 = sun动画半径 + (整个View的半径 - 80(sun距离中心点的高度) - sun半径)
+        mSunAnimY = mSunAnimCircle + (mParentWidth / 2 - getValue(80) - sunCircle);
+
+        mSunAnimXY = getCircleXY(mSunAnimX, mSunAnimY, mSunAnimCircle, -120);
+        mSunPath.addCircle(mSunAnimXY[0], mSunAnimXY[1], sunCircle, Path.Direction.CW);
     }
 
     /**
      * 画中间的三座山
      *
-     * @param left  中心点左坐标
-     * @param right 中心点右坐标
+     * @param x 中心点左坐标
+     * @param y 中心点右坐标
      */
-    private void drawMo(int left, int right, int down) {
-        drawMo(null, left, right, down);
-    }
-
-    private void drawMo(Canvas canvas, int left, int right, int down) {
+    private void drawMo(int x, int y, int down) {
         // 左右山 Y坐标相对于中心点下移多少
         int lrmYpoint = down + getValue(30);
         // 左右山 X坐标相对于中心点左移或右移多少
@@ -209,61 +218,49 @@ public class Scenery extends View {
         // 左山
         mLeftMountainPath.reset();
         // 起点
-        mLeftMountainPath.moveTo(left - lrdPoint, right + lrmYpoint);
-        mLeftMountainPath.lineTo(left - lrdPoint + lrBanDis, right + lrmYpoint + lrBanGao);
-        mLeftMountainPath.lineTo(left - lrdPoint - lrBanDis, right + lrmYpoint + lrBanGao);
+        mLeftMountainPath.moveTo(x - lrdPoint, y + lrmYpoint);
+        mLeftMountainPath.lineTo(x - lrdPoint + lrBanDis, y + lrmYpoint + lrBanGao);
+        mLeftMountainPath.lineTo(x - lrdPoint - lrBanDis, y + lrmYpoint + lrBanGao);
         // 使这些点构成封闭的多边形
         mLeftMountainPath.close();
-        if (canvas != null) {
-            canvas.drawPath(mLeftMountainPath, mLeftMountainPaint);
-        }
+        // canvas.drawPath(mLeftMountainPath, mLeftMountainPaint);
+
         // 右山
         mRightMountainPath.reset();
-        mRightMountainPath.moveTo(left + lrdPoint + getValue(10), right + lrmYpoint);
-        mRightMountainPath.lineTo(left + lrdPoint + getValue(10) + lrBanDis, right + lrmYpoint + lrBanGao);
-        mRightMountainPath.lineTo(left + lrdPoint + getValue(10) - lrBanDis, right + lrmYpoint + lrBanGao);
+        mRightMountainPath.moveTo(x + lrdPoint + getValue(10), y + lrmYpoint);
+        mRightMountainPath.lineTo(x + lrdPoint + getValue(10) + lrBanDis, y + lrmYpoint + lrBanGao);
+        mRightMountainPath.lineTo(x + lrdPoint + getValue(10) - lrBanDis, y + lrmYpoint + lrBanGao);
         mRightMountainPath.close();
-        if (canvas != null) {
-            canvas.drawPath(mRightMountainPath, mRightMountainPaint);
-        }
 
         // 中山
         mMidMountainPath.reset();
-        mMidMountainPath.moveTo(left, right + down);
-        mMidMountainPath.lineTo(left + getValue(220), right + down + mParentHeight / 2 + mParentHeight / 14);
-        mMidMountainPath.lineTo(left - getValue(220), right + down + mParentHeight / 2 + mParentHeight / 14);
+        mMidMountainPath.moveTo(x, y + down);
+        mMidMountainPath.lineTo(x + getValue(220), y + down + mParentHeight / 2 + mParentHeight / 14);
+        mMidMountainPath.lineTo(x - getValue(220), y + down + mParentHeight / 2 + mParentHeight / 14);
         mMidMountainPath.close();
-        if (canvas != null) {
-            canvas.drawPath(mMidMountainPath, mMidMountainPaint);
-        }
 
-        mMaxLeftRightTranslationY = (right + down + mParentHeight / 2) / 14;
+        // 左右山移动的距离
+        mMaxLeftRightTranslationY = (y + down + mParentHeight / 2) / 14;
     }
 
     /**
      * 云
      */
     private void drawYun(int w, int h) {
-        mLeftCloudPath.reset();
-
-        float centerX = w / 2; //view's center x coordinate
-        float minSize = Math.min(w, h); //get the min size
+        mCloudPath.reset();
 
         // 云的宽度
-//        float leftCloudWidth = minSize / 2f; //the width of cloud
-        float leftCloudWidth = minSize / 1.4f; //the width of cloud
+        float leftCloudWidth = mParentWidth / 1.4f; //the width of cloud
         // 云的 最底下圆柱的高度
         float leftCloudBottomHeight = leftCloudWidth / 3f; //the bottom height of cloud
         // 云的 最底下圆柱的半径
         float leftCloudBottomRoundRadius = leftCloudBottomHeight; //the bottom round radius of cloud
 
         float leftCloudEndX = (w - leftCloudWidth - leftCloudWidth * CLOUD_SCALE_RATIO / 2) / 2 + leftCloudWidth; //the left cloud end x coordinate
-//        float leftCloudEndY = (h / 3) + getValue(318); //clouds' end y coordinate
         float leftCloudEndY = (h / 3) + getValue(342); //clouds' end y coordinate
-//        float leftCloudEndY = (h / 3)+getValue(100); //clouds' end y coordinate
 
         //add the bottom round rect
-        mLeftCloudPath.addRoundRect(new RectF(leftCloudEndX - leftCloudWidth, leftCloudEndY - leftCloudBottomHeight,
+        mCloudPath.addRoundRect(new RectF(leftCloudEndX - leftCloudWidth, leftCloudEndY - leftCloudBottomHeight,
                 leftCloudEndX, leftCloudEndY), leftCloudBottomHeight, leftCloudBottomRoundRadius, Path.Direction.CW);
 
         float leftCloudTopCenterY = leftCloudEndY - leftCloudBottomHeight;
@@ -271,41 +268,48 @@ public class Scenery extends View {
         float leftCloudLeftTopCenterX = leftCloudEndX - leftCloudWidth + leftCloudBottomRoundRadius;
 
         // 最右边的云
-        mLeftCloudPath.addCircle(leftCloudRightTopCenterX + getValue(12), leftCloudTopCenterY + getValue(14), leftCloudBottomRoundRadius * 3 / 4, Path.Direction.CW);
+        mCloudPath.addCircle(leftCloudRightTopCenterX + getValue(12), leftCloudTopCenterY + getValue(14), leftCloudBottomRoundRadius * 3 / 4, Path.Direction.CW);
         // 中间的云
-        mLeftCloudPath.addCircle((leftCloudRightTopCenterX + leftCloudLeftTopCenterX - getValue(23)) / 2 - getValue(10), leftCloudTopCenterY - getValue(0), leftCloudBottomRoundRadius / 7, Path.Direction.CW);
+        mCloudPath.addCircle((leftCloudRightTopCenterX + leftCloudLeftTopCenterX - getValue(23)) / 2 - getValue(10), leftCloudTopCenterY - getValue(0), leftCloudBottomRoundRadius / 7, Path.Direction.CW);
         // 左边的云
-        mLeftCloudPath.addCircle(leftCloudLeftTopCenterX - getValue(32), leftCloudTopCenterY + getValue(16), leftCloudBottomRoundRadius / 2, Path.Direction.CW);
+        mCloudPath.addCircle(leftCloudLeftTopCenterX - getValue(32), leftCloudTopCenterY + getValue(16), leftCloudBottomRoundRadius / 2, Path.Direction.CW);
 
         mMaxTranslationX = leftCloudBottomRoundRadius / 2;
     }
 
+    /**
+     * start animator
+     */
     public void playAnimator() {
-        playAnimator(true);
+        playCloudMouAnimator(true);
+        setSunAnimator();
     }
 
-    private void playAnimator(boolean isFirst) {
-        setupAnimator(isFirst);
+    /**
+     * 开始云和左右两边山的动画
+     *
+     * @param isFirst 是否第一次播放
+     */
+    private void playCloudMouAnimator(boolean isFirst) {
+        setYunAnimator(isFirst);
         setLeftRightMouAnimator(isFirst);
         setMidMouAnimator(isFirst);
     }
 
     /**
-     * 设置云的动画
+     * 云的动画
      */
-    public void setupAnimator(boolean isFirst) {
+    private void setYunAnimator(boolean isFirst) {
+        ValueAnimator mLeftCloudAnimator;
         if (isFirst) {
-            mLeftCloudAnimatorPlayTime = 0;
             mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
-            mLeftCloudAnimator.setDuration(1500);
             mLeftCloudAnimator.setStartDelay(0);
         } else {
-            mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
-            mLeftCloudAnimator.setDuration(1500);
-            mLeftCloudAnimator.setStartDelay(200);
+            mLeftCloudAnimator = ValueAnimator.ofFloat(-7, 0);
+            mLeftCloudAnimator.setStartDelay(100);
         }
+        mLeftCloudAnimator.setDuration(1500);
         mLeftCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-//        mLeftCloudAnimator.setRepeatMode(ValueAnimator.REVERSE);
         mLeftCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -324,17 +328,19 @@ public class Scenery extends View {
 
     }
 
-
-    public void setLeftRightMouAnimator(boolean isFirst) {
+    /**
+     * 左右两边山的动画
+     */
+    private void setLeftRightMouAnimator(boolean isFirst) {
+        ValueAnimator mLeftRightMouAnimator;
         if (isFirst) {
             mLeftRightMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
-            mLeftRightMouAnimator.setDuration(1500);
             mLeftRightMouAnimator.setStartDelay(0);
         } else {
             mLeftRightMouAnimator = ValueAnimator.ofFloat(10, 0);
-            mLeftRightMouAnimator.setDuration(1500);
             mLeftRightMouAnimator.setStartDelay(200);
         }
+        mLeftRightMouAnimator.setDuration(1500);
         mLeftRightMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mLeftRightMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -346,17 +352,19 @@ public class Scenery extends View {
         mLeftRightMouAnimator.start();
     }
 
-    public void setMidMouAnimator(final boolean isFirst) {
+    /**
+     * 中间的山的动画
+     */
+    private void setMidMouAnimator(final boolean isFirst) {
+        ValueAnimator mMidMouAnimator;
         if (isFirst) {
             mMidMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
-            mMidMouAnimator.setDuration(1500);
             mMidMouAnimator.setStartDelay(200);
         } else {
             mMidMouAnimator = ValueAnimator.ofFloat(10, 0);
-            mMidMouAnimator.setDuration(1500);
             mMidMouAnimator.setStartDelay(0);
         }
-
+        mMidMouAnimator.setDuration(1500);
         mMidMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mMidMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -373,7 +381,7 @@ public class Scenery extends View {
                     postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            playAnimator(false);
+                            playCloudMouAnimator(false);
                         }
                     }, 100);
                 }
@@ -382,13 +390,49 @@ public class Scenery extends View {
         mMidMouAnimator.start();
     }
 
+    /**
+     * sun的动画
+     */
+    private void setSunAnimator() {
+        ValueAnimator mSunAnimator = ValueAnimator.ofFloat(-120, 240);
+        mSunAnimator.setDuration(3600);
+        mSunAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        mSunAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mSunAnimatorValue = (float) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
+        mSunAnimator.start();
+    }
+
 
     /**
-     * 得到父布局为 150dp 时的值
+     * 得到父布局为 150dp 时的对应值
      *
      * @param originalValue 原始值
      */
     private int getValue(float originalValue) {
         return (int) (mParentWidth / (394 / originalValue));
     }
+
+    /**
+     * 求sun旋转时，圆上的点。起点为最右边的点，顺时针。
+     * https://blog.csdn.net/can3981132/article/details/52559402
+     * x1   =   x0   +   r   *   cos(a   *   PI  /180  )
+     * y1   =   y0   +   r   *   sin(a   *   PI  /180  )
+     *
+     * @param angle         角度
+     * @param circleCenterX 圆心x坐标
+     * @param circleCenterY 圆心y坐标
+     * @param circleR       半径
+     */
+    private int[] getCircleXY(int circleCenterX, int circleCenterY, int circleR, float angle) {
+        int x = (int) (circleCenterX + circleR * Math.cos(angle * Math.PI / 180));
+        int y = (int) (circleCenterY + circleR * Math.sin(angle * Math.PI / 180));
+        return new int[]{x, y};
+    }
+
+
 }
