@@ -21,8 +21,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
  *
  * @author jingbin
  */
-public class Scenery extends View {
+public class SceneryView extends View {
 
+    private final static float CLOUD_SCALE_RATIO = 0.85f;
     private int mParentWidth = 394;
     private int mParentHeight = 394;
     private int mSunWidth;
@@ -31,46 +32,43 @@ public class Scenery extends View {
     private int mSunAnimY;
     private int[] mSunAnimXY;
 
-    private Path mCloudPath;          // the cloud's path
-    private Path mLeftMountainPath;   // the left mountain's path
-    private Path mRightMountainPath;  // the right mountain's path
-    private Path mMidMountainPath;    // the mid mountain's path
-    private Path mSunPath;            // the  sun's path
+    private float mMaxCloudTranslationX;
+    private float mMaxLeftRightMouTranslationY;
+    private float mCloudAnimatorValue;
+    private float mLeftRightMouAnimatorValue;
+    private float mMidMouAnimatorValue;
+    private float mSunAnimatorValue = -120;
 
-    private final static float CLOUD_SCALE_RATIO = 0.85f;
+    private Path mCloudPath;
+    private Path mLeftMountainPath;
+    private Path mRightMountainPath;
+    private Path mMidMountainPath;
+    private Path mSunPath;
+
     private Paint mCloudPaint;
     private Paint mLeftMountainPaint;
     private Paint mRightMountainPaint;
     private Paint mMidMountainPaint;
     private Paint mSunPaint;
 
-    // 云朵
-    private float mMaxTranslationX; //The max translation x when do animation.
-    private float mLeftCloudAnimatorValue; //The left cloud animator value
-    private Matrix mComputeMatrix = new Matrix(); //The matrix for computing
-    private Path mComputePath = new Path(); //The path for computing
-
-    private float mMaxLeftRightTranslationY;
-    private float mLeftRightMouAnimatorValue;
-    private float mMidMouAnimatorValue;
-    private float mSunAnimatorValue = -120;
-
+    private Matrix mComputeMatrix = new Matrix();
     private Matrix mComputeMatrix2 = new Matrix();
     private Matrix mComputeMatrix3 = new Matrix();
     private Matrix mComputeMatrix4 = new Matrix();
+    private Path mComputePath = new Path();
     private Path mComputePath2 = new Path();
     private Path mComputePath3 = new Path();
     private Path mComputePath4 = new Path();
 
-    public Scenery(Context context) {
+    public SceneryView(Context context) {
         this(context, null);
     }
 
-    public Scenery(Context context, AttributeSet attrs) {
+    public SceneryView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public Scenery(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SceneryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         // 步骤1：初始化动画属性
         initAttrs(context, attrs);
@@ -119,7 +117,6 @@ public class Scenery extends View {
         mMidMountainPaint.setAntiAlias(true);
         mMidMountainPaint.setColor(Color.WHITE);
 
-        // 太阳
         mSunPaint = new Paint();
         mSunPaint.setColor(Color.YELLOW);
         mSunPaint.setAntiAlias(true);
@@ -163,7 +160,7 @@ public class Scenery extends View {
 
         // 左右的山
         mComputeMatrix2.reset();
-        mComputeMatrix2.postTranslate(0, mMaxLeftRightTranslationY * mLeftRightMouAnimatorValue);
+        mComputeMatrix2.postTranslate(0, mMaxLeftRightMouTranslationY * mLeftRightMouAnimatorValue);
         mLeftMountainPath.transform(mComputeMatrix2, mComputePath2);
         canvas.drawPath(mComputePath2, mLeftMountainPaint);
         mRightMountainPath.transform(mComputeMatrix2, mComputePath2);
@@ -171,13 +168,13 @@ public class Scenery extends View {
 
         // 中间的山
         mComputeMatrix3.reset();
-        mComputeMatrix3.postTranslate(0, mMaxLeftRightTranslationY * mMidMouAnimatorValue);
+        mComputeMatrix3.postTranslate(0, mMaxLeftRightMouTranslationY * mMidMouAnimatorValue);
         mMidMountainPath.transform(mComputeMatrix3, mComputePath3);
         canvas.drawPath(mComputePath3, mMidMountainPaint);
 
         // 云朵
         mComputeMatrix.reset();
-        mComputeMatrix.postTranslate(mMaxTranslationX * mLeftCloudAnimatorValue, 0);
+        mComputeMatrix.postTranslate(mMaxCloudTranslationX * mCloudAnimatorValue, 0);
         mCloudPath.transform(mComputeMatrix, mComputePath);
         canvas.drawPath(mComputePath, mCloudPaint);
 //        canvas.restore();
@@ -240,7 +237,7 @@ public class Scenery extends View {
         mMidMountainPath.close();
 
         // 左右山移动的距离
-        mMaxLeftRightTranslationY = (y + down + mParentHeight / 2) / 14;
+        mMaxLeftRightMouTranslationY = (y + down + mParentHeight / 2) / 14;
     }
 
     /**
@@ -274,7 +271,7 @@ public class Scenery extends View {
         // 左边的云
         mCloudPath.addCircle(leftCloudLeftTopCenterX - getValue(32), leftCloudTopCenterY + getValue(16), leftCloudBottomRoundRadius / 2, Path.Direction.CW);
 
-        mMaxTranslationX = leftCloudBottomRoundRadius / 2;
+        mMaxCloudTranslationX = leftCloudBottomRoundRadius / 2;
     }
 
     /**
@@ -313,7 +310,7 @@ public class Scenery extends View {
         mLeftCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                mLeftCloudAnimatorValue = (float) animation.getAnimatedValue();
+                mCloudAnimatorValue = (float) animation.getAnimatedValue();
                 invalidate();
             }
         });

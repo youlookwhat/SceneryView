@@ -5,7 +5,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import me.jingbin.library.Scenery;
+import me.jingbin.library.SceneryView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,8 +17,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void start(View view) {
-        Scenery scenery_icon = findViewById(R.id.scenery_icon);
-        Scenery scenery = findViewById(R.id.scenery);
+        SceneryView scenery_icon = findViewById(R.id.scenery_icon);
+        SceneryView scenery = findViewById(R.id.scenery);
         scenery_icon.playAnimator();
         scenery.playAnimator();
     }
