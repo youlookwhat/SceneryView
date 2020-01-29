@@ -1,4 +1,4 @@
-package me.jingbin.library;
+package me.jingbin.library.scenery;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -12,7 +12,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -32,7 +31,7 @@ public class SceneryView extends View {
     private final static int DEFAULT_CLOUD_COLOR = Color.parseColor("#B6C4F3");
     private int mParentWidth = 394;
     private int mParentHeight = 394;
-    private int mSunWidth;
+    private int mViewCircle;
     private int mSunAnimCircle;
     private int mSunAnimX;
     private int mSunAnimY;
@@ -51,8 +50,9 @@ public class SceneryView extends View {
     private Path mRightMountainPath;
     private Path mMidMountainPath;
     private Path mSunPath;
+    private Path mRoundPath;
 
-    private Paint backgroundPaint;
+    private Paint mBackgroundPaint;
     private Paint mCloudPaint;
     private Paint mLeftMountainPaint;
     private Paint mRightMountainPaint;
@@ -112,9 +112,7 @@ public class SceneryView extends View {
         mRightMountainPath = new Path();
         mMidMountainPath = new Path();
         mSunPath = new Path();
-
-        // 关闭硬件加速
-        setLayerType(LAYER_TYPE_SOFTWARE, null);
+        mRoundPath = new Path();
 
         mCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mCloudPaint.setColor(mCloudColor);
@@ -123,11 +121,9 @@ public class SceneryView extends View {
         mCloudPaint.setStyle(Paint.Style.FILL);
 
         // 背景
-        backgroundPaint = new Paint();
-        // 自定义颜色
-        backgroundPaint.setColor(mBackgroundColor);
-        // 设置画笔的锯齿效果
-        backgroundPaint.setAntiAlias(true);
+        mBackgroundPaint = new Paint();
+        mBackgroundPaint.setColor(mBackgroundColor);
+        mBackgroundPaint.setAntiAlias(true);
 
         mLeftMountainPaint = new Paint();
         mLeftMountainPaint.setAntiAlias(true);
@@ -162,24 +158,19 @@ public class SceneryView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         // 取宽高的最小值
         mParentWidth = mParentHeight = Math.min(getWidth(), getHeight());
-
-        Log.e("onSizeChanged", "width = " + getWidth() + "， height = " + getHeight());
-        drawMo(mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
+        // View的半径
+        mViewCircle = mParentWidth >> 1;
+        drawMo(mViewCircle, mViewCircle - getValue(10), getValue(10));
         drawYun(mParentWidth + getValue(200), mParentHeight);
         drawSun();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // 圆框
-        Path mPath = new Path();
-        mPath.addCircle(mParentWidth / 2, mParentWidth / 2, mParentWidth / 2, Path.Direction.CW);
-        canvas.clipPath(mPath);
-
+        mRoundPath.addCircle(mViewCircle, mViewCircle, mViewCircle, Path.Direction.CW);
+        canvas.clipPath(mRoundPath);
         super.onDraw(canvas);
-        Log.e("Scenery", "onDraw： " + "width = " + getWidth() + "， height = " + getHeight());
-
-        canvas.drawCircle(mParentWidth / 2, mParentHeight / 2, mParentWidth / 2, backgroundPaint);
+        canvas.drawCircle(mViewCircle, mViewCircle, mViewCircle, mBackgroundPaint);
 
         // 太阳
 //        canvas.drawCircle((mParentWidth / 2) - getValue(90), (mParentHeight / 2) - getValue(80), sunWidth / 2, mSunPaint);
@@ -219,15 +210,15 @@ public class SceneryView extends View {
 
     private void drawSun() {
         // sun图形的直径
-        mSunWidth = getValue(70);
+        int sunWidth = getValue(70);
         // sun图形的半径
-        int sunCircle = mSunWidth / 2;
+        int sunCircle = sunWidth / 2;
         // sun动画半径 = (sun半径 + 80(sun距离中心点的高度) + 整个View的半径 + sun半径 + 20(sun距离整个View的最下沿的间距)) / 2
-        mSunAnimCircle = (mSunWidth + getValue(100) + mParentWidth / 2) / 2;
+        mSunAnimCircle = (sunWidth + getValue(100) + mViewCircle) / 2;
         // sun动画的圆心x坐标
-        mSunAnimX = mParentWidth / 2;
+        mSunAnimX = mViewCircle;
         // sun动画的圆心y坐标 = sun动画半径 + (整个View的半径 - 80(sun距离中心点的高度) - sun半径)
-        mSunAnimY = mSunAnimCircle + (mParentWidth / 2 - getValue(80) - sunCircle);
+        mSunAnimY = mSunAnimCircle + (mViewCircle - getValue(80) - sunCircle);
 
         mSunAnimXY = getCircleXY(mSunAnimX, mSunAnimY, mSunAnimCircle, -120);
         mSunPath.addCircle(mSunAnimXY[0], mSunAnimXY[1], sunCircle, Path.Direction.CW);
@@ -284,14 +275,14 @@ public class SceneryView extends View {
         mCloudPath.reset();
 
         // 云的宽度
-        float leftCloudWidth = mParentWidth / 1.4f; //the width of cloud
+        float leftCloudWidth = mParentWidth / 1.4f;
         // 云的 最底下圆柱的高度
-        float leftCloudBottomHeight = leftCloudWidth / 3f; //the bottom height of cloud
+        float leftCloudBottomHeight = leftCloudWidth / 3f;
         // 云的 最底下圆柱的半径
-        float leftCloudBottomRoundRadius = leftCloudBottomHeight; //the bottom round radius of cloud
+        float leftCloudBottomRoundRadius = leftCloudBottomHeight;
 
-        float leftCloudEndX = (w - leftCloudWidth - leftCloudWidth * CLOUD_SCALE_RATIO / 2) / 2 + leftCloudWidth; //the left cloud end x coordinate
-        float leftCloudEndY = (h / 3) + getValue(342); //clouds' end y coordinate
+        float leftCloudEndX = (w - leftCloudWidth - leftCloudWidth * CLOUD_SCALE_RATIO / 2) / 2 + leftCloudWidth;
+        float leftCloudEndY = (h / 3) + getValue(342);
 
         //add the bottom round rect
         mCloudPath.addRoundRect(new RectF(leftCloudEndX - leftCloudWidth, leftCloudEndY - leftCloudBottomHeight,
@@ -471,7 +462,7 @@ public class SceneryView extends View {
      */
     public SceneryView setColorBackground(int colorBackground) {
         this.mBackgroundColor = colorBackground;
-        backgroundPaint.setColor(mBackgroundColor);
+        mBackgroundPaint.setColor(mBackgroundColor);
         postInvalidate();
         return this;
     }

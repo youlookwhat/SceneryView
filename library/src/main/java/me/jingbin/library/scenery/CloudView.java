@@ -1,4 +1,4 @@
-package me.jingbin.library;
+package me.jingbin.library.scenery;
 
 import android.animation.ValueAnimator;
 import android.content.Context;

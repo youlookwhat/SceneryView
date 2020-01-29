@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <me.jingbin.library.SceneryView
+        <me.jingbin.library.scenery.SceneryView
             android:id="@+id/scenery_icon"
             android:layout_width="300dp"
             android:layout_height="300dp"
@@ -26,16 +26,8 @@
 
     </RelativeLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/bt_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="start"
-        android:text="开始"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <RelativeLayout
+        android:id="@+id/rl_footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -43,12 +35,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rl_header">
 
-        <me.jingbin.library.SceneryView
+        <me.jingbin.library.scenery.SceneryView
             android:id="@+id/scenery"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:layout_centerInParent="true"
             android:layout_margin="20dp" />
     </RelativeLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/bt_start"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:onClick="start"
+        android:text="开始"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rl_footer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
