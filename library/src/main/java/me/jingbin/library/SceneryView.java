@@ -113,6 +113,7 @@ public class SceneryView extends View {
         mMidMountainPath = new Path();
         mSunPath = new Path();
 
+        // 关闭硬件加速
         setLayerType(LAYER_TYPE_SOFTWARE, null);
 
         mCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -156,7 +157,6 @@ public class SceneryView extends View {
         }
     }
 
-    // 获取View宽高
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -331,10 +331,10 @@ public class SceneryView extends View {
             mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
             mLeftCloudAnimator.setStartDelay(0);
         } else {
-            mLeftCloudAnimator = ValueAnimator.ofFloat(-7, 0);
+            mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
             mLeftCloudAnimator.setStartDelay(100);
         }
-        mLeftCloudAnimator.setDuration(1500);
+        mLeftCloudAnimator.setDuration(1000);
         mLeftCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mLeftCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -361,12 +361,10 @@ public class SceneryView extends View {
         ValueAnimator mLeftRightMouAnimator;
         if (isFirst) {
             mLeftRightMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
-            mLeftRightMouAnimator.setStartDelay(0);
         } else {
             mLeftRightMouAnimator = ValueAnimator.ofFloat(10, 0);
-            mLeftRightMouAnimator.setStartDelay(200);
         }
-        mLeftRightMouAnimator.setDuration(1500);
+        mLeftRightMouAnimator.setDuration(1000);
         mLeftRightMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mLeftRightMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -386,11 +384,12 @@ public class SceneryView extends View {
         if (isFirst) {
             mMidMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
             mMidMouAnimator.setStartDelay(200);
+            mMidMouAnimator.setDuration(1200);
         } else {
             mMidMouAnimator = ValueAnimator.ofFloat(10, 0);
             mMidMouAnimator.setStartDelay(0);
+            mMidMouAnimator.setDuration(900);
         }
-        mMidMouAnimator.setDuration(1500);
         mMidMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mMidMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -421,7 +420,7 @@ public class SceneryView extends View {
      */
     private void setSunAnimator() {
         ValueAnimator mSunAnimator = ValueAnimator.ofFloat(-120, 240);
-        mSunAnimator.setDuration(3600);
+        mSunAnimator.setDuration(2700);
         mSunAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mSunAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
