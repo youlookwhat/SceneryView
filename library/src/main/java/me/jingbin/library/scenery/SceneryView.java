@@ -39,9 +39,10 @@ public class SceneryView extends View {
     private boolean mIsStart = false;
 
     private float mMaxCloudTranslationX;
-    private float mMaxLeftRightMouTranslationY;
+    private float mMaxMouTranslationY;
     private float mCloudAnimatorValue;
-    private float mLeftRightMouAnimatorValue;
+    private float mLeftMouAnimatorValue;
+    private float mRightMouAnimatorValue;
     private float mMidMouAnimatorValue;
     private float mSunAnimatorValue = -120;
 
@@ -52,21 +53,23 @@ public class SceneryView extends View {
     private Path mSunPath;
     private Path mRoundPath;
 
-    private Paint mBackgroundPaint;
     private Paint mCloudPaint;
     private Paint mLeftMountainPaint;
     private Paint mRightMountainPaint;
     private Paint mMidMountainPaint;
     private Paint mSunPaint;
+    private Paint mBackgroundPaint;
 
-    private Matrix mComputeMatrix = new Matrix();
-    private Matrix mComputeMatrix2 = new Matrix();
-    private Matrix mComputeMatrix3 = new Matrix();
-    private Matrix mComputeMatrix4 = new Matrix();
-    private Path mComputePath = new Path();
-    private Path mComputePath2 = new Path();
-    private Path mComputePath3 = new Path();
-    private Path mComputePath4 = new Path();
+    private Matrix mCloudComputeMatrix = new Matrix();
+    private Matrix mLeftComputeMatrix = new Matrix();
+    private Matrix mRightComputeMatrix = new Matrix();
+    private Matrix mMidComputeMatrix = new Matrix();
+    private Matrix mSunComputeMatrix = new Matrix();
+    private Path mCloudComputePath = new Path();
+    private Path mLeftComputePath = new Path();
+    private Path mRightComputePath = new Path();
+    private Path mMidComputePath = new Path();
+    private Path mSunComputePath = new Path();
 
     private int mSunColor = DEFAULT_SUN_COLOR;
     private int mLeftMouColor = DEFAULT_LEFT_RIGHT_MOU_COLOR;
@@ -160,8 +163,8 @@ public class SceneryView extends View {
         mParentWidth = mParentHeight = Math.min(getWidth(), getHeight());
         // View的半径
         mViewCircle = mParentWidth >> 1;
-        drawMo(mViewCircle, mViewCircle - getValue(10), getValue(10));
-        drawYun(mParentWidth + getValue(200), mParentHeight);
+        drawMou(mViewCircle, mViewCircle - getValue(10), getValue(10));
+        drawCloud(mParentWidth + getValue(200), mParentHeight);
         drawSun();
     }
 
@@ -176,35 +179,39 @@ public class SceneryView extends View {
 //        canvas.drawCircle((mParentWidth / 2) - getValue(90), (mParentHeight / 2) - getValue(80), sunWidth / 2, mSunPaint);
 
         // 三座山
-//        drawMo(canvas, mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
+//        drawMou(canvas, mParentWidth / 2, (mParentHeight / 2) - getValue(10), getValue(10));
 
         // 太阳
-        mComputeMatrix4.reset();
+        mSunComputeMatrix.reset();
         // x y 坐标
         int[] circleXY = getCircleXY(mSunAnimX, mSunAnimY, mSunAnimCircle, mSunAnimatorValue);
-        mComputeMatrix4.postTranslate(circleXY[0] - mSunAnimXY[0], circleXY[1] - mSunAnimXY[1]);
-        mSunPath.transform(mComputeMatrix4, mComputePath4);
-        canvas.drawPath(mComputePath4, mSunPaint);
+        mSunComputeMatrix.postTranslate(circleXY[0] - mSunAnimXY[0], circleXY[1] - mSunAnimXY[1]);
+        mSunPath.transform(mSunComputeMatrix, mSunComputePath);
+        canvas.drawPath(mSunComputePath, mSunPaint);
 
-        // 左右的山
-        mComputeMatrix2.reset();
-        mComputeMatrix2.postTranslate(0, mMaxLeftRightMouTranslationY * mLeftRightMouAnimatorValue);
-        mLeftMountainPath.transform(mComputeMatrix2, mComputePath2);
-        canvas.drawPath(mComputePath2, mLeftMountainPaint);
-        mRightMountainPath.transform(mComputeMatrix2, mComputePath2);
-        canvas.drawPath(mComputePath2, mRightMountainPaint);
+        // 左边的山
+        mLeftComputeMatrix.reset();
+        mLeftComputeMatrix.postTranslate(0, mMaxMouTranslationY * mLeftMouAnimatorValue);
+        mLeftMountainPath.transform(mLeftComputeMatrix, mLeftComputePath);
+        canvas.drawPath(mLeftComputePath, mLeftMountainPaint);
+
+        // 右边的山
+        mRightComputeMatrix.reset();
+        mRightComputeMatrix.postTranslate(0, mMaxMouTranslationY * mRightMouAnimatorValue);
+        mRightMountainPath.transform(mRightComputeMatrix, mRightComputePath);
+        canvas.drawPath(mRightComputePath, mRightMountainPaint);
 
         // 中间的山
-        mComputeMatrix3.reset();
-        mComputeMatrix3.postTranslate(0, mMaxLeftRightMouTranslationY * mMidMouAnimatorValue);
-        mMidMountainPath.transform(mComputeMatrix3, mComputePath3);
-        canvas.drawPath(mComputePath3, mMidMountainPaint);
+        mMidComputeMatrix.reset();
+        mMidComputeMatrix.postTranslate(0, mMaxMouTranslationY * mMidMouAnimatorValue);
+        mMidMountainPath.transform(mMidComputeMatrix, mMidComputePath);
+        canvas.drawPath(mMidComputePath, mMidMountainPaint);
 
         // 云朵
-        mComputeMatrix.reset();
-        mComputeMatrix.postTranslate(mMaxCloudTranslationX * mCloudAnimatorValue, 0);
-        mCloudPath.transform(mComputeMatrix, mComputePath);
-        canvas.drawPath(mComputePath, mCloudPaint);
+        mCloudComputeMatrix.reset();
+        mCloudComputeMatrix.postTranslate(mMaxCloudTranslationX * mCloudAnimatorValue, 0);
+        mCloudPath.transform(mCloudComputeMatrix, mCloudComputePath);
+        canvas.drawPath(mCloudComputePath, mCloudPaint);
 //        canvas.restore();
     }
 
@@ -230,7 +237,7 @@ public class SceneryView extends View {
      * @param x 中心点左坐标
      * @param y 中心点右坐标
      */
-    private void drawMo(int x, int y, int down) {
+    private void drawMou(int x, int y, int down) {
         // 左右山 Y坐标相对于中心点下移多少
         int lrmYpoint = down + getValue(30);
         // 左右山 X坐标相对于中心点左移或右移多少
@@ -265,13 +272,13 @@ public class SceneryView extends View {
         mMidMountainPath.close();
 
         // 左右山移动的距离
-        mMaxLeftRightMouTranslationY = (y + down + mParentHeight / 2) / 14;
+        mMaxMouTranslationY = (y + down + mViewCircle) / 14;
     }
 
     /**
      * 云
      */
-    private void drawYun(int w, int h) {
+    private void drawCloud(int w, int h) {
         mCloudPath.reset();
 
         // 云的宽度
@@ -303,29 +310,30 @@ public class SceneryView extends View {
     }
 
     /**
-     * 开始云和左右两边山的动画
+     * 开始云和山的动画
      *
      * @param isFirst 是否第一次播放
      */
     private void playCloudMouAnimator(boolean isFirst) {
-        setYunAnimator(isFirst);
-        setLeftRightMouAnimator(isFirst);
+        setCloudAnimator(isFirst);
+        setLeftMouAnimator(isFirst);
+        setRightMouAnimator(isFirst);
         setMidMouAnimator(isFirst);
     }
 
     /**
      * 云的动画
      */
-    private void setYunAnimator(boolean isFirst) {
+    private void setCloudAnimator(boolean isFirst) {
         ValueAnimator mLeftCloudAnimator;
         if (isFirst) {
             mLeftCloudAnimator = ValueAnimator.ofFloat(0, 5);
             mLeftCloudAnimator.setStartDelay(0);
         } else {
             mLeftCloudAnimator = ValueAnimator.ofFloat(-8, 0);
-            mLeftCloudAnimator.setStartDelay(100);
+            mLeftCloudAnimator.setStartDelay(200);
         }
-        mLeftCloudAnimator.setDuration(1000);
+        mLeftCloudAnimator.setDuration(800);
         mLeftCloudAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mLeftCloudAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -346,21 +354,22 @@ public class SceneryView extends View {
     }
 
     /**
-     * 左右两边山的动画
+     * 左边山的动画
      */
-    private void setLeftRightMouAnimator(boolean isFirst) {
+    private void setLeftMouAnimator(boolean isFirst) {
         ValueAnimator mLeftRightMouAnimator;
         if (isFirst) {
             mLeftRightMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
         } else {
             mLeftRightMouAnimator = ValueAnimator.ofFloat(10, 0);
         }
-        mLeftRightMouAnimator.setDuration(1000);
+        mLeftRightMouAnimator.setStartDelay(100);
+        mLeftRightMouAnimator.setDuration(800);
         mLeftRightMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mLeftRightMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                mLeftRightMouAnimatorValue = (float) animation.getAnimatedValue();
+                mLeftMouAnimatorValue = (float) animation.getAnimatedValue();
                 invalidate();
             }
         });
@@ -368,18 +377,40 @@ public class SceneryView extends View {
     }
 
     /**
-     * 中间的山的动画
+     * 右边山的动画
+     */
+    private void setRightMouAnimator(boolean isFirst) {
+        ValueAnimator mLeftRightMouAnimator;
+        if (isFirst) {
+            mLeftRightMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
+        } else {
+            mLeftRightMouAnimator = ValueAnimator.ofFloat(10, 0);
+        }
+        mLeftRightMouAnimator.setDuration(800);
+        mLeftRightMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        mLeftRightMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mRightMouAnimatorValue = (float) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
+        mLeftRightMouAnimator.start();
+    }
+
+    /**
+     * 中间山的动画
      */
     private void setMidMouAnimator(final boolean isFirst) {
         ValueAnimator mMidMouAnimator;
         if (isFirst) {
             mMidMouAnimator = ValueAnimator.ofFloat(0, -1, 10);
             mMidMouAnimator.setStartDelay(200);
-            mMidMouAnimator.setDuration(1200);
+            mMidMouAnimator.setDuration(1000);
         } else {
             mMidMouAnimator = ValueAnimator.ofFloat(10, 0);
             mMidMouAnimator.setStartDelay(0);
-            mMidMouAnimator.setDuration(900);
+            mMidMouAnimator.setDuration(600);
         }
         mMidMouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         mMidMouAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

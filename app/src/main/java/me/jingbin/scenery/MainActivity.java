@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import me.jingbin.library.scenery.SceneryView;
 
 
+/**
+ * @author jingbin
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
