@@ -23,8 +23,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void start(View view) {
         SceneryView sceneryIcon = findViewById(R.id.scenery_icon);
-        SceneryView scenery = findViewById(R.id.scenery);
         sceneryIcon.playAnimator();
+
+        final SceneryView scenery = findViewById(R.id.scenery);
+        scenery.setOnAnimationListener(new SceneryView.AnimationListener() {
+            @Override
+            public void onAnimationEnd() {
+                scenery.setMidMouColor(Color.BLACK);
+            }
+        });
         scenery.setColorBackground(Color.GRAY)
                 .setSunColor(Color.RED)
                 .playAnimator();

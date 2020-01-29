@@ -456,6 +456,9 @@ public class SceneryView extends View {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 mIsStart = false;
+                if (listener != null) {
+                    listener.onAnimationEnd();
+                }
             }
         });
         mSunAnimator.start();
@@ -531,5 +534,15 @@ public class SceneryView extends View {
         mCloudPaint.setColor(mCloudColor);
         postInvalidate();
         return this;
+    }
+
+    private AnimationListener listener;
+
+    public void setOnAnimationListener(AnimationListener listener) {
+        this.listener = listener;
+    }
+
+    public interface AnimationListener {
+        void onAnimationEnd();
     }
 }
