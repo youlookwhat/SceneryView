@@ -1,6 +1,6 @@
 <div align=center><img width="355" height=“208” src="https://github.com/youlookwhat/Scenery/blob/master/art/SceneryView.gif?raw=true"/></div>
 
-# Scenery
+# Scenery <img alt="Scenery is an android library" src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19"> [![minSdk for Scenery](https://img.shields.io/badge/minSdk-15-green.svg)](#)
 🏜 Hand-painted scenery, let it fly~
 
 
