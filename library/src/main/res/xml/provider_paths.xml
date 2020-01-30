@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path path="Android/data/me.jingbin.scenery/" name="share_files_path" />
+    <external-path path="." name="root_path" />
+    <!--下载-->
+    <external-path path="Android/data/me.jingbin.scenery/" name="files_root" />
+    <external-path path="." name="external_storage_root" />
+
+    <cache-path  path="Pictures" name="cache_pic" />
+    <cache-path  path="." name="cache_photos" />
+    <external-path path="Pictures" name="camera_pictures" />
+    <external-path path="." name="camera_photos" />
+    <root-path path="" name="root_photos" />
+</paths>
