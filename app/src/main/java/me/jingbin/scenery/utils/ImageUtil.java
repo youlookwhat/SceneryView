@@ -1,4 +1,4 @@
-package me.jingbin.library.scenery.utils;
+package me.jingbin.scenery.utils;
 
 import android.content.Context;
 import android.content.Intent;
