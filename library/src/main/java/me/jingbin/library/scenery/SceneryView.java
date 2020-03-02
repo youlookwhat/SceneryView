@@ -120,29 +120,23 @@ public class SceneryView extends View {
         mCloudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mCloudPaint.setColor(mCloudColor);
         // 中间重复的覆盖
-        mCloudPaint.setAntiAlias(true);
         mCloudPaint.setStyle(Paint.Style.FILL);
 
         // 背景
-        mBackgroundPaint = new Paint();
+        mBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mBackgroundPaint.setColor(mBackgroundColor);
-        mBackgroundPaint.setAntiAlias(true);
 
-        mLeftMountainPaint = new Paint();
-        mLeftMountainPaint.setAntiAlias(true);
+        mLeftMountainPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mLeftMountainPaint.setColor(mLeftMouColor);
 
-        mRightMountainPaint = new Paint();
-        mRightMountainPaint.setAntiAlias(true);
+        mRightMountainPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mRightMountainPaint.setColor(mRightMouColor);
 
-        mMidMountainPaint = new Paint();
-        mMidMountainPaint.setAntiAlias(true);
+        mMidMountainPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mMidMountainPaint.setColor(mMidMouColor);
 
-        mSunPaint = new Paint();
+        mSunPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mSunPaint.setColor(mSunColor);
-        mSunPaint.setAntiAlias(true);
     }
 
     /**

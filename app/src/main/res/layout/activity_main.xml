@@ -9,9 +9,9 @@
 
     <RelativeLayout
         android:id="@+id/rl_header"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="50dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/shape_view_box"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,8 +19,8 @@
 
         <me.jingbin.library.scenery.SceneryView
             android:id="@+id/scenery_icon"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_centerInParent="true"
             android:layout_margin="20dp" />
 
@@ -30,17 +30,29 @@
         android:id="@+id/rl_footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:background="@color/colorWhite"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rl_header">
 
         <me.jingbin.library.scenery.SceneryView
             android:id="@+id/scenery"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_centerInParent="true"
-            android:layout_margin="20dp" />
+            android:layout_margin="20dp"
+            app:background_color="#2483D9" />
+        <!--<me.jingbin.library.scenery.RoundImageView-->
+        <!--android:id="@+id/scenery"-->
+        <!--android:layout_width="144dp"-->
+        <!--android:layout_height="144dp"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_margin="20dp"-->
+        <!--android:src="@drawable/ipicture_app"-->
+        <!--app:image_circle="true"-->
+        <!--app:image_shadow="true"-->
+        <!--app:shadow_color="0xff808080"-->
+        <!--app:image_shadow_radius="5dp" />-->
     </RelativeLayout>
 
     <androidx.appcompat.widget.AppCompatButton
@@ -54,5 +66,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rl_footer" />
+
+    <me.jingbin.library.scenery.FallingView
+        android:id="@+id/fallingView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
