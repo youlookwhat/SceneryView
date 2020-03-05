@@ -72,4 +72,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <me.jingbin.library.scenery.PerfectArcView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start"
+        app:p_arc_endColor="@color/colorPrimary"
+        app:p_arc_showImage="false"
+        app:p_arc_startColor="@color/colorIconBg" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
