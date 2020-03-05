@@ -29,4 +29,15 @@
         <attr name="p_arc_startColor" format="integer" />
         <attr name="p_arc_endColor" format="integer" />
     </declare-styleable>
+
+    <declare-styleable name="PullLoadingView">
+        <!--  菊花颜色  -->
+        <attr name="aiv_color" format="color" />
+        <!--  开始角度  -->
+        <attr name="aiv_startAngle" format="integer" />
+        <!--  线条宽度  -->
+        <attr name="aiv_strokeWidth" format="dimension" />
+        <!--  是否自动开始  -->
+        <attr name="aiv_auto_start" format="boolean" />
+    </declare-styleable>
 </resources>

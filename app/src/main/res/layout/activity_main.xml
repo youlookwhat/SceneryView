@@ -72,6 +72,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <me.jingbin.library.scenery.PullLoadingView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="30dp"
+        app:aiv_strokeWidth="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_start" />
+
     <me.jingbin.library.scenery.PerfectArcView
         android:layout_width="match_parent"
         android:layout_height="150dp"
