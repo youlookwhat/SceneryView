@@ -164,6 +164,7 @@ public class SceneryView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        mRoundPath.reset();
         mRoundPath.addCircle(mViewCircle, mViewCircle, mViewCircle, Path.Direction.CW);
         canvas.clipPath(mRoundPath);
         super.onDraw(canvas);
@@ -177,6 +178,7 @@ public class SceneryView extends View {
 
         // 太阳
         mSunComputeMatrix.reset();
+        mSunComputePath.reset();
         // x y 坐标
         int[] circleXY = getCircleXY(mSunAnimX, mSunAnimY, mSunAnimCircle, mSunAnimatorValue);
         mSunComputeMatrix.postTranslate(circleXY[0] - mSunAnimXY[0], circleXY[1] - mSunAnimXY[1]);
@@ -185,11 +187,13 @@ public class SceneryView extends View {
 
         // 左边的山
         mLeftComputeMatrix.reset();
+        mLeftComputePath.reset();
         mLeftComputeMatrix.postTranslate(0, mMaxMouTranslationY * mLeftMouAnimatorValue);
         mLeftMountainPath.transform(mLeftComputeMatrix, mLeftComputePath);
         canvas.drawPath(mLeftComputePath, mLeftMountainPaint);
 
         // 右边的山
+        mRightComputeMatrix.reset();
         mRightComputeMatrix.reset();
         mRightComputeMatrix.postTranslate(0, mMaxMouTranslationY * mRightMouAnimatorValue);
         mRightMountainPath.transform(mRightComputeMatrix, mRightComputePath);
@@ -197,12 +201,14 @@ public class SceneryView extends View {
 
         // 中间的山
         mMidComputeMatrix.reset();
+        mMidComputePath.reset();
         mMidComputeMatrix.postTranslate(0, mMaxMouTranslationY * mMidMouAnimatorValue);
         mMidMountainPath.transform(mMidComputeMatrix, mMidComputePath);
         canvas.drawPath(mMidComputePath, mMidMountainPaint);
 
         // 云朵
         mCloudComputeMatrix.reset();
+        mCloudComputePath.reset();
         mCloudComputeMatrix.postTranslate(mMaxCloudTranslationX * mCloudAnimatorValue, 0);
         mCloudPath.transform(mCloudComputeMatrix, mCloudComputePath);
         canvas.drawPath(mCloudComputePath, mCloudPaint);
