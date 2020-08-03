@@ -25,13 +25,13 @@ allprojects {
 
 ```java
 dependencies {
-	implementation 'com.github.youlookwhat:SceneryView:1.0.0'
+	implementation 'com.github.youlookwhat:SceneryView:1.0.1'
 }
 ```
 
 #### In layout.xml
 ```xml
-<me.jingbin.library.scenery.SceneryView
+<me.jingbin.scenery.SceneryView
     android:id="@+id/scenery"
     android:layout_width="100dp"
     android:layout_height="100dp"
