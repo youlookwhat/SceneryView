@@ -1,4 +1,4 @@
-package me.jingbin.library.scenery;
+package me.jingbin.scenery;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -11,6 +11,8 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+
+import me.jingbin.library.scenery.R;
 
 /**
  * ios 菊花加载

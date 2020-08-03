@@ -1,4 +1,4 @@
-package me.jingbin.library.scenery;
+package me.jingbin.scenery;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

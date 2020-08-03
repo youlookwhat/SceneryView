@@ -5,8 +5,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import me.jingbin.library.scenery.FallObject;
-import me.jingbin.library.scenery.SceneryView;
 import me.jingbin.scenery.utils.ImageUtil;
 
 

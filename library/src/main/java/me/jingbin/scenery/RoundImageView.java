@@ -1,4 +1,4 @@
-package me.jingbin.library.scenery;
+package me.jingbin.scenery;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -16,6 +16,8 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 
 import androidx.appcompat.widget.AppCompatImageView;
+
+import me.jingbin.library.scenery.R;
 
 /**
  * Created by jingbin on 2020-02-19.
