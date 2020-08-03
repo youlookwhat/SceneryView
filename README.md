@@ -3,12 +3,11 @@
 
 🏜 Hand-painted scenery, let it fly~
 
-<div align=center><img width="355" height=“208” src="https://github.com/youlookwhat/Scenery/blob/master/art/SceneryView.gif?raw=true"/></div>
+<!--<div align=center><img width="355" height=“208” src="https://github.com/youlookwhat/Scenery/blob/master/art/SceneryView.gif?raw=true"/></div>-->
+
+![](https://github.com/youlookwhat/Scenery/blob/master/art/SceneryView.gif)
 
 原型来自dribbble：[Gallery App Icon](https://dribbble.com/shots/4761564)
-
-
-
 
 <!--
 ## link
