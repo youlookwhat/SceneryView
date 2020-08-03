@@ -1,11 +1,11 @@
 # Scenery
-<!--<img alt="Scenery is an android library" src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">--> <img width="119" height=“19” src="https://www.cleveroad.com/public/comercial/label-android.svg"/> [![minSdk for Scenery](https://img.shields.io/badge/minSdk-15-green.svg)](#)
+<img width="119" height=“19” src="https://www.cleveroad.com/public/comercial/label-android.svg"/> [![minSdk for Scenery](https://img.shields.io/badge/minSdk-15-green.svg)](#)
 
 🏜 Hand-painted scenery, let it fly~
 
 <!--<div align=center><img width="355" height=“208” src="https://github.com/youlookwhat/Scenery/blob/master/art/SceneryView.gif?raw=true"/></div>-->
 
-<!--<img width="110" height=“19” src="https://www.cleveroad.com/public/comercial/label-android.svg"/>-->
+<!--<img alt="Scenery is an android library" src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">--> 
 
 ![](https://github.com/youlookwhat/Scenery/blob/master/art/SceneryView.gif)
 
