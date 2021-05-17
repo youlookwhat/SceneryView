@@ -1,5 +1,5 @@
 # SceneryView
-<img width="119" height=“19” src="https://www.cleveroad.com/public/comercial/label-android.svg"/> [![](https://jitpack.io/v/youlookwhat/SceneryView.svg)](https://jitpack.io/#youlookwhat/SceneryView) [![minSdk for Scenery](https://img.shields.io/badge/minSdk-15-green.svg)](#)
+[![](https://jitpack.io/v/youlookwhat/SceneryView.svg)](https://jitpack.io/#youlookwhat/SceneryView) [![minSdk for Scenery](https://img.shields.io/badge/minSdk-15-green.svg)](#)
 
 🏜 Hand-painted scenery, let it fly~
 
