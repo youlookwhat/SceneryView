@@ -57,7 +57,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/bt_start"
-        style="@style/Widget.AppCompat.Button.Colored"
+        style="@style/Widget.AppCompat.Toolbar.Button.Navigation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorAccent"
@@ -73,6 +73,7 @@
         android:layout_height="match_parent" />
 
     <me.jingbin.scenery.PullLoadingView
+        android:id="@+id/juhua"
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:layout_marginTop="30dp"
@@ -88,6 +89,61 @@
         app:layout_constraintTop_toBottomOf="@+id/bt_start"
         app:p_arc_endColor="@color/colorPrimary"
         app:p_arc_showImage="false"
-        app:p_arc_startColor="@color/colorIconBg" />
+        app:p_arc_startColor="@color/colorIconBg"
+        tools:visibility="gone" />
 
+    <me.jingbin.scenery.progress.ProgressView
+        android:id="@+id/progressView"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/juhua" />
+
+    <me.jingbin.scenery.wave.WaveSlipView2
+        android:id="@+id/progressView22"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/juhua" />
+
+
+    <me.jingbin.scenery.CircleWaveProgressView2
+        android:id="@+id/progressView33"
+        android:layout_width="152dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        app:currentProgress="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/juhua" />
+
+    <TextView
+        android:id="@+id/tv_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:shadowColor="#B76EFF"
+        android:shadowDx="2.0"
+        android:shadowDy="2.0"
+        android:shadowRadius="2.0"
+        android:text="识别中"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/progressView33"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/progressView33" />
+
+    <TextView
+        android:id="@+id/tv_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

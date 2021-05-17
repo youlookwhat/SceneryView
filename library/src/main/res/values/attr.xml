@@ -40,4 +40,24 @@
         <!--  是否自动开始  -->
         <attr name="aiv_auto_start" format="boolean" />
     </declare-styleable>
+
+
+    <!--这里的名字要和自定义的View名称一样，不然在xml布局中无法引用-->
+    <declare-styleable name="CircleWaveProgressView">
+        <!--波浪的颜色-->
+        <attr name="wave_color" format="color"></attr>
+        <!--圆形背景颜色-->
+        <attr name="circlebg_color" format="color"></attr>
+        <!--波浪长度-->
+        <attr name="wave_length" format="dimension"></attr>
+        <!--波浪高度-->
+        <attr name="wave_height" format="dimension"></attr>
+        <!--当前进度-->
+        <attr name="currentProgress" format="float"></attr>
+        <!--最大进度-->
+        <attr name="maxProgress" format="float"></attr>
+        <!--第二层波浪的颜色-->
+        <attr name="second_color" format="color"></attr>
+    </declare-styleable>
+
 </resources>
