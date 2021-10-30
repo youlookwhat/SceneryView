@@ -10,6 +10,7 @@
 ![](https://github.com/youlookwhat/Scenery/blob/master/art/SceneryView.gif)
 
 原型来自dribbble：[Gallery App Icon](https://dribbble.com/shots/4761564)
+文章描述：[自定义View实现Dribbble上动感的Gallery App Icon](https://juejin.cn/post/7024883320269832205)
 
 
 ### Usage
