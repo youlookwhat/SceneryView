@@ -42,7 +42,7 @@
     </declare-styleable>
 
 
-    <!--这里的名字要和自定义的View名称一样，不然在xml布局中无法引用-->
+    <!--横向双水波浪进度条-->
     <declare-styleable name="HorizontalWaveProgressView">
         <!--波浪的颜色-->
         <attr name="wave_color" format="color" />

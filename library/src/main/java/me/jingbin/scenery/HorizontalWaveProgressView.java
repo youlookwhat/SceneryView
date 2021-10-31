@@ -235,23 +235,15 @@ public class HorizontalWaveProgressView extends View {
      * 绘制第二层波浪
      */
     private Path canvasSecondPath() {
-        float secondWaveHeight = waveHeight;
         secondWavePath.reset();
-        //移动到右上方，也就是p1点
+        //初始点移动到下方，然后往上绘制波浪
         secondWavePath.moveTo((currentPercent) * waveActualSizeWidth, waveActualSizeHeight + moveDistance);
-        //p1 - p0
         for (int i = 0; i < waveNumber * 2; i++) {
-            secondWavePath.rQuadTo(secondWaveHeight, -waveLength / 2, 0, -waveLength);
-            secondWavePath.rQuadTo(-secondWaveHeight, -waveLength / 2, 0, -waveLength);
+            secondWavePath.rQuadTo(waveHeight, -waveLength / 2, 0, -waveLength);
+            secondWavePath.rQuadTo(-waveHeight, -waveLength / 2, 0, -waveLength);
         }
-        //p3-p0的高度随着进度变化而变化
         secondWavePath.lineTo(0, 0);
-        //连接p3 - p2
         secondWavePath.lineTo(0, waveActualSizeHeight);
-        secondWavePath.lineTo(waveActualSizeHeight, waveActualSizeWidth);
-        //连接p2 - p1
-        secondWavePath.lineTo(waveActualSizeWidth, waveActualSizeHeight + moveDistance);
-        //封闭起来填充
         secondWavePath.close();
         return secondWavePath;
     }
@@ -296,7 +288,7 @@ public class HorizontalWaveProgressView extends View {
         return result;
     }
 
-    //新建一个动画类
+    // 新建一个动画类
     public class WaveProgressAnimal extends Animation {
 
         //在绘制动画的过程中会反复的调用applyTransformation函数，
