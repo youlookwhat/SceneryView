@@ -11,6 +11,8 @@
 
 原型来自dribbble：[Gallery App Icon](https://dribbble.com/shots/4761564)
 
+对应文章：[《自定义View实现Dribbble上动感的Gallery App Icon》](https://juejin.cn/post/7024883320269832205)
+
 
 ### Usage
 #### Gradle
