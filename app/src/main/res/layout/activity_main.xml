@@ -122,13 +122,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/juhua"
-        tools:currentProgress="65"
+        tools:currentProgress="85"
         wave:border_color="@color/colorPrimary"
-        wave:circlebg_color="@color/colorWhite"
-        wave:currentProgress="110"
-        wave:maxProgress="110"
+        wave:currentProgress="100"
+        wave:maxProgress="100"
         wave:second_color="@color/colorIconBg"
         wave:second_show="true"
+        wave:wave_background_color="@color/colorWhite"
         wave:wave_color="@color/colorPrimary" />
 
     <TextView

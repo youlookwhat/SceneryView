@@ -1,6 +1,5 @@
 package me.jingbin.scenery;
 
-import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -36,27 +35,28 @@ public class HorizontalWaveProgressView extends View {
     private Paint wavePaint;
     //绘制波浪Path
     private Path wavePath;
-    private Path waveTwoPath;
     //波浪的宽度
-    private float waveLength;
+    private final float waveLength;
     //波浪的高度
-    private float waveHeight;
+    private final float waveHeight;
     //波浪组的数量 一个波浪是一低一高
     private int waveNumber;
     //自定义View的波浪宽高
     private int waveDefaultWidth;
-
+    private int waveDefaultHeight;
     //测量后的View实际宽高
     private int waveActualSizeWidth;
-
+    private int waveActualSizeHeight;
     //当前进度值占总进度值的占比
     private float currentPercent;
     //当前进度值
-    private float currentProgress;
+    private int currentProgress;
     //进度的最大值
-    private float maxProgress;
+    private int maxProgress;
     //动画对象
-    private WaveProgressAnimat waveProgressAnimat;
+    private WaveProgressAnimal waveProgressAnimator;
+    private ValueAnimator mProgressAnimator;
+    private ValueAnimator mEndAnimator;
     //波浪平移距离
     private float moveDistance = 0;
     //圆形背景画笔
@@ -68,21 +68,20 @@ public class HorizontalWaveProgressView extends View {
     //bitmap画布
     private Canvas bitmapCanvas;
     //波浪颜色
-    private int wave_color;
+    private final int wave_color;
     //圆形背景进度框颜色
-    private int circle_bgcolor;
+    private final int backgroundColor;
     //进度条显示值监听接口
     private UpdateTextListener updateTextListener;
     //是否绘制双波浪线
     private boolean isShowSecondWave;
     //第二层波浪的颜色
-    private int second_WaveColor;
+    private final int secondWaveColor;
     //边框色
-    private int borderColor;
+    private final int borderColor;
     //第二层波浪的画笔
     private Paint secondWavePaint;
-    private int waveDefaultHeight;
-    private int waveActualSizeHeight;
+    private Path secondWavePath;
     private int dp1;
     // 圆角角度
     private int dp27;
@@ -107,15 +106,15 @@ public class HorizontalWaveProgressView extends View {
         //获取波浪颜色
         wave_color = typedArray.getColor(R.styleable.HorizontalWaveProgressView_wave_color, Color.parseColor("#B76EFF"));
         //圆形背景颜色
-        circle_bgcolor = typedArray.getColor(R.styleable.HorizontalWaveProgressView_circlebg_color, Color.WHITE);
+        backgroundColor = typedArray.getColor(R.styleable.HorizontalWaveProgressView_wave_background_color, Color.WHITE);
         //当前进度
-        currentProgress = typedArray.getFloat(R.styleable.HorizontalWaveProgressView_currentProgress, 0);
+        currentProgress = typedArray.getInteger(R.styleable.HorizontalWaveProgressView_currentProgress, 0);
         //最大进度
-        maxProgress = typedArray.getFloat(R.styleable.HorizontalWaveProgressView_maxProgress, 100);
+        maxProgress = typedArray.getInteger(R.styleable.HorizontalWaveProgressView_maxProgress, 100);
         //是否显示第二层波浪
         isShowSecondWave = typedArray.getBoolean(R.styleable.HorizontalWaveProgressView_second_show, false);
         //第二层波浪的颜色
-        second_WaveColor = typedArray.getColor(R.styleable.HorizontalWaveProgressView_second_color, Color.parseColor("#DEBCFF"));
+        secondWaveColor = typedArray.getColor(R.styleable.HorizontalWaveProgressView_second_color, Color.parseColor("#DEBCFF"));
         //边框色
         borderColor = typedArray.getColor(R.styleable.HorizontalWaveProgressView_border_color, Color.parseColor("#DEBCFF"));
         //记得把TypedArray回收
@@ -149,7 +148,7 @@ public class HorizontalWaveProgressView extends View {
 
         //矩形背景
         backgroundPaint = new Paint();
-        backgroundPaint.setColor(circle_bgcolor);
+        backgroundPaint.setColor(backgroundColor);
         backgroundPaint.setAntiAlias(true);
 
         //边框
@@ -161,19 +160,17 @@ public class HorizontalWaveProgressView extends View {
 
         if (isShowSecondWave) {
             //是否绘制双波浪线
-            waveTwoPath = new Path();
+            secondWavePath = new Path();
             //初始化第二层波浪画笔
             secondWavePaint = new Paint();
-            secondWavePaint.setColor(second_WaveColor);
+            secondWavePaint.setColor(secondWaveColor);
             secondWavePaint.setAntiAlias(true);
             //因为要覆盖在第一层波浪上，且要让半透明生效，所以选SRC_ATOP模式
             secondWavePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         }
 
         //占比一开始设置为0
-        currentPercent = currentProgress / maxProgress;
-        //动画实例化
-        waveProgressAnimat = new WaveProgressAnimat();
+        currentPercent = currentProgress * 1f / maxProgress;
     }
 
 
@@ -187,12 +184,14 @@ public class HorizontalWaveProgressView extends View {
         // 绘制背景，为了能让波浪填充完整个圆形背景
         RectF rectBg = new RectF(0, 0, waveActualSizeWidth, waveActualSizeHeight);
         bitmapCanvas.drawRoundRect(rectBg, dp27, dp27, backgroundPaint);
-        //是否绘制第二层波浪
+
+
         if (isShowSecondWave) {
+            //绘制第二层波浪
             bitmapCanvas.drawPath(canvasSecondPath(), secondWavePaint);
         }
-        //绘制波浪形
-        bitmapCanvas.drawPath(paintWavePath(), wavePaint);
+//绘制波浪形
+        bitmapCanvas.drawPath(canvasWavePath(), wavePaint);
         //裁剪图片
         canvas.drawBitmap(circleBitmap, 0, 0, null);
         // 绘制边框
@@ -202,11 +201,8 @@ public class HorizontalWaveProgressView extends View {
 
     /**
      * 绘制波浪线
-     *
-     * @return
      */
-    private Path paintWavePath() {
-
+    private Path canvasWavePath() {
         //要先清掉路线
         wavePath.reset();
         //起始点移至(0,0) p0 -p1 的高度随着进度的变化而变化
@@ -218,8 +214,6 @@ public class HorizontalWaveProgressView extends View {
         for (int i = 0; i < waveNumber * 2; i++) {
             wavePath.rQuadTo(waveHeight, waveLength / 2, 0, waveLength);
             wavePath.rQuadTo(-waveHeight, waveLength / 2, 0, waveLength);
-//            wavePath.rQuadTo(waveLength / 2,waveHeight,waveLength,0);
-//            wavePath.rQuadTo(waveLength / 2,-waveHeight,waveLength,0);
         }
         //连接p1 - p2
         wavePath.lineTo(waveActualSizeWidth, waveActualSizeHeight);
@@ -232,13 +226,36 @@ public class HorizontalWaveProgressView extends View {
         return wavePath;
     }
 
+    /**
+     * 绘制第二层波浪方法
+     */
+    private Path canvasSecondPath() {
+        float secondWaveHeight = waveHeight;
+        secondWavePath.reset();
+        //移动到右上方，也就是p1点
+        secondWavePath.moveTo((currentPercent) * waveActualSizeWidth, waveActualSizeHeight + moveDistance);
+        //p1 - p0
+        for (int i = 0; i < waveNumber * 2; i++) {
+            secondWavePath.rQuadTo(secondWaveHeight, -waveLength / 2, 0, -waveLength);
+            secondWavePath.rQuadTo(-secondWaveHeight, -waveLength / 2, 0, -waveLength);
+        }
+        //p3-p0的高度随着进度变化而变化
+        secondWavePath.lineTo(0, 0);
+        //连接p3 - p2
+        secondWavePath.lineTo(0, waveActualSizeHeight);
+        secondWavePath.lineTo(waveActualSizeHeight, waveActualSizeWidth);
+        //连接p2 - p1
+        secondWavePath.lineTo(waveActualSizeWidth, waveActualSizeHeight + moveDistance);
+        //封闭起来填充
+        secondWavePath.close();
+        return secondWavePath;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int height = measureSize(waveDefaultHeight, heightMeasureSpec);
         int width = measureSize(waveDefaultWidth, widthMeasureSpec);
-        //获取View的最短边的长度
-//        int minSize = Math.min(height, width);
+        int height = measureSize(waveDefaultHeight, heightMeasureSpec);
         //把View改为正方形
         setMeasuredDimension(width, height);
         //waveActualSize是实际的宽高
@@ -251,8 +268,6 @@ public class HorizontalWaveProgressView extends View {
         // Math.ceil(-0.65)=-0.0
         //这里是调整波浪数量 就是View中能容下几个波浪 用到ceil就是一定让View完全能被波浪占满 为循环绘制做准备 分母越小就约精准
         waveNumber = (int) Math.ceil(Double.parseDouble(String.valueOf(waveActualSizeHeight / waveLength / 2)));
-
-
     }
 
     /**
@@ -260,7 +275,6 @@ public class HorizontalWaveProgressView extends View {
      *
      * @param defaultSize 默认的值
      * @param measureSpec 模式
-     * @return
      */
     private int measureSize(int defaultSize, int measureSpec) {
         int result = defaultSize;
@@ -278,33 +292,125 @@ public class HorizontalWaveProgressView extends View {
     }
 
     //新建一个动画类
-    public class WaveProgressAnimat extends Animation {
-
+    public class WaveProgressAnimal extends Animation {
 
         //在绘制动画的过程中会反复的调用applyTransformation函数，
         // 每次调用参数interpolatedTime值都会变化，该参数从0渐 变为1，当该参数为1时表明动画结束
         @Override
         protected void applyTransformation(float interpolatedTime, Transformation t) {
             super.applyTransformation(interpolatedTime, t);
-//            Log.e("interpolatedTime", interpolatedTime + "");
-            //波浪高度达到最高就不用循环，只需要平移
-//            if (currentPercent < currentProgress / maxProgress) {
-//                currentPercent = interpolatedTime * currentProgress / maxProgress;
-//            Log.e("currentPercent", currentPercent + "");
-            //这里直接根据进度值显示
-//                tv_progress.setText(updateTextListener.updateText(interpolatedTime, currentProgress, maxProgress));
-//            }
             //左边的距离
             moveDistance = interpolatedTime * waveNumber * waveLength * 2;
             //重新绘制
             invalidate();
-
         }
     }
 
+    /**
+     * 直接结束
+     *
+     * @param duration 结束时间
+     */
+    public void setProgressEnd(long duration, AnimatorListenerAdapter listenerAdapter) {
+        // 如果是100会不满，因为在波动
+        if (currentProgress == maxProgress) {
+            // 到底了就从头开始
+            currentPercent = 0;
+        }
+        mEndAnimator = ValueAnimator.ofFloat(currentPercent, 1.1f);
+        mEndAnimator.setInterpolator(new DecelerateInterpolator());
+        mEndAnimator.setDuration(duration);
+        mEndAnimator.addUpdateListener(listener);
+        mEndAnimator.addListener(listenerAdapter);
+        mEndAnimator.start();
+
+        // 波浪线
+        startWaveAnimal();
+    }
+
+    /**
+     * 设置进度
+     *
+     * @param currentProgress 进度
+     * @param duration        达到进度需要的时间
+     */
+    public void setProgress(int currentProgress, long duration, AnimatorListenerAdapter listenerAdapter) {
+        float percent = currentProgress * 1f / maxProgress;
+        this.currentProgress = currentProgress;
+        //从0开始变化
+        currentPercent = 0;
+        moveDistance = 0;
+        mProgressAnimator = ValueAnimator.ofFloat(0, percent);
+        //设置动画时间
+        mProgressAnimator.setDuration(duration);
+        //让动画匀速播放，避免出现波浪平移停顿的现象
+        mProgressAnimator.setInterpolator(new LinearInterpolator());
+        mProgressAnimator.addUpdateListener(listener);
+        mProgressAnimator.addListener(listenerAdapter);
+        mProgressAnimator.start();
+
+        // 波浪线
+        startWaveAnimal();
+    }
+
+    /**
+     * 波浪动画
+     */
+    private void startWaveAnimal() {
+        //动画实例化
+        if (waveProgressAnimator == null) {
+            waveProgressAnimator = new WaveProgressAnimal();
+            //设置动画时间
+            waveProgressAnimator.setDuration(2000);
+            //设置循环播放
+            waveProgressAnimator.setRepeatCount(Animation.INFINITE);
+            //让动画匀速播放，避免出现波浪平移停顿的现象
+            waveProgressAnimator.setInterpolator(new LinearInterpolator());
+            //当前视图开启动画
+            this.startAnimation(waveProgressAnimator);
+        }
+    }
+
+    /**
+     * 进度的监听
+     */
+    ValueAnimator.AnimatorUpdateListener listener = new ValueAnimator.AnimatorUpdateListener() {
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+            // 当前进度百分比，[0,1]
+            currentPercent = (float) animation.getAnimatedValue();
+            //这里直接根据进度值显示
+            if (updateTextListener != null) {
+                updateTextListener.updateText(currentPercent, maxProgress);
+            }
+        }
+    };
+
+
+    public interface UpdateTextListener {
+        /**
+         * 提供接口 给外部修改数值样式 等
+         *
+         * @param currentPercent 当前进度百分比
+         * @param maxProgress    进度条的最大数值
+         */
+        void updateText(float currentPercent, float maxProgress);
+    }
+
+    /**
+     * 设置监听
+     */
+    public void setUpdateTextListener(UpdateTextListener updateTextListener) {
+        this.updateTextListener = updateTextListener;
+
+    }
+
+    /**
+     * 停止动画，销毁对象
+     */
     public void stopAnimal() {
-        if (waveProgressAnimat != null) {
-            waveProgressAnimat.cancel();
+        if (waveProgressAnimator != null) {
+            waveProgressAnimator.cancel();
         }
         if (mProgressAnimator != null && mProgressAnimator.isStarted()) {
             mProgressAnimator.removeAllListeners();
@@ -315,182 +421,4 @@ public class HorizontalWaveProgressView extends View {
             mEndAnimator.cancel();
         }
     }
-
-    private ValueAnimator mProgressAnimator;
-    private ValueAnimator mEndAnimator;
-
-    public void setProgressEnd(int time, AnimatorListenerAdapter listenerAdapter) {
-//        if (mProgressAnimator != null) {
-//            mProgressAnimator.cancel();
-//        }
-
-        // 如果是100会不满，因为在波动
-        this.currentProgress = 110;
-        mEndAnimator = ValueAnimator.ofFloat(mCurrentProgress, 1.1f);
-        mEndAnimator.setInterpolator(new DecelerateInterpolator());
-        mEndAnimator.setDuration(time);
-        mEndAnimator.addUpdateListener(listener);
-        mEndAnimator.addListener(listenerAdapter);
-        if (updateTextListener != null) {
-            mEndAnimator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    updateTextListener.animatorEnd(true);
-                }
-            });
-        }
-        mEndAnimator.start();
-    }
-
-    private float mCurrentProgress;
-
-    public void setProgress(final float currentProgress, int time, AnimatorListenerAdapter listenerAdapter) {
-        // -------------------------------进度-------------------------------
-        float v = currentProgress / 110;
-        this.currentProgress = currentProgress;
-        //从0开始变化
-        currentPercent = 0;
-        moveDistance = 0;
-        mProgressAnimator = ValueAnimator.ofFloat(0, v);
-
-        //设置动画时间
-        mProgressAnimator.setDuration(time);
-        //设置循环播放
-        //让动画匀速播放，避免出现波浪平移停顿的现象
-        mProgressAnimator.setInterpolator(new LinearInterpolator());
-        mProgressAnimator.addUpdateListener(listener);
-//        mProgressAnimator.addListener(new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationRepeat(Animator animation) {
-//                super.onAnimationRepeat(animation);
-        //如果需要让波浪到达最高处后平移的速度改变，给动画设置监听即可
-//                if (currentPercent >= currentProgress / maxProgress) {
-//                    // 波浪晃动时间
-//                    mSunAnimator.setDuration(2000);
-//                }
-//            }
-//        });
-//        if (updateTextListener != null) {
-//            mProgressAnimator.addListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-//                    super.onAnimationEnd(animation);
-//                    updateTextListener.animatorEnd(false);
-//                }
-//            });
-//        }
-        mProgressAnimator.addListener(listenerAdapter);
-        mProgressAnimator.start();
-
-        // -------------------------------波浪线-------------------------------
-        //设置动画时间
-        waveProgressAnimat.setDuration(2000);
-        //设置循环播放
-        waveProgressAnimat.setRepeatCount(Animation.INFINITE);
-        //让动画匀速播放，避免出现波浪平移停顿的现象
-        waveProgressAnimat.setInterpolator(new LinearInterpolator());
-        waveProgressAnimat.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-                //如果需要让波浪到达最高处后平移的速度改变，给动画设置监听即可
-//                if (currentPercent >= currentProgress / maxProgress) {
-//                    // 波浪晃动时间
-//                    waveProgressAnimat.setDuration(2000);
-//                }
-            }
-        });
-        //当前视图开启动画
-        this.startAnimation(waveProgressAnimat);
-    }
-
-    ValueAnimator.AnimatorUpdateListener listener = new ValueAnimator.AnimatorUpdateListener() {
-        @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-            float interpolatedTime = (float) animation.getAnimatedValue();
-            mCurrentProgress = interpolatedTime;
-//            Log.e("mCurrentProgress11", interpolatedTime + "");
-            //波浪高度达到最高就不用循环，只需要平移
-            if (currentPercent < currentProgress / maxProgress) {
-//                currentPercent = interpolatedTime * currentProgress / maxProgress;
-                currentPercent = interpolatedTime;
-//                Log.e("currentPercent", currentPercent + "");
-                //这里直接根据进度值显示
-//                tv_progress.setText(updateTextListener.updateText(interpolatedTime, currentProgress, maxProgress));
-                if (updateTextListener != null) {
-                    updateTextListener.updateText(interpolatedTime, currentProgress, maxProgress);
-                }
-            }
-//            左边的距离
-//            moveDistance = interpolatedTime * waveNumber * waveLength * 2;
-//            Log.e("moveDistance", moveDistance + "");
-            //重新绘制
-//            invalidate();
-        }
-    };
-
-
-    //定义数值监听
-    public interface UpdateTextListener {
-        /**
-         * 提供接口 给外部修改数值样式 等
-         *
-         * @param interpolatedTime 这个值是动画的 从0变成1
-         * @param currentProgress  进度条的数值
-         * @param maxProgress      进度条的最大数值
-         * @return
-         */
-        void updateText(float interpolatedTime, float currentProgress, float maxProgress);
-
-        void animatorEnd(boolean isEnd);
-    }
-
-    //设置监听
-    public void setUpdateTextListener(UpdateTextListener updateTextListener) {
-        this.updateTextListener = updateTextListener;
-
-    }
-
-    //是否绘制第二层波浪
-    public void isSetSecondWave(boolean isShowSecondWave) {
-        this.isShowSecondWave = isShowSecondWave;
-    }
-
-    /**
-     * 绘制第二层波浪方法
-     */
-    private Path canvasSecondPath() {
-        float secondWaveHeight = waveHeight;
-        waveTwoPath.reset();
-
-        //移动到右上方，也就是p1点
-        waveTwoPath.moveTo((currentPercent) * waveActualSizeWidth, waveActualSizeHeight + moveDistance);
-        //p1 - p0
-        for (int i = 0; i < waveNumber * 2; i++) {
-            waveTwoPath.rQuadTo(secondWaveHeight, -waveLength / 2, 0, -waveLength);
-            waveTwoPath.rQuadTo(-secondWaveHeight, -waveLength / 2, 0, -waveLength);
-        }
-        //p3-p0的高度随着进度变化而变化
-        waveTwoPath.lineTo(0, 0);
-        //连接p3 - p2
-        waveTwoPath.lineTo(0, waveActualSizeHeight);
-        waveTwoPath.lineTo(waveActualSizeHeight, waveActualSizeWidth);
-        //连接p2 - p1
-        waveTwoPath.lineTo(waveActualSizeWidth, waveActualSizeHeight + moveDistance);
-        //封闭起来填充
-        waveTwoPath.close();
-        return waveTwoPath;
-
-    }
-
 }

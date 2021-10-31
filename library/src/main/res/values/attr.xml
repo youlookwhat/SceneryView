@@ -47,21 +47,21 @@
         <!--波浪的颜色-->
         <attr name="wave_color" format="color" />
         <!--圆形背景颜色-->
-        <attr name="circlebg_color" format="color" />
+        <attr name="wave_background_color" format="color" />
+        <!--边框的颜色-->
+        <attr name="border_color" format="color" />
         <!--波浪长度-->
         <attr name="wave_length" format="dimension" />
         <!--波浪高度-->
         <attr name="wave_height" format="dimension" />
         <!--当前进度-->
-        <attr name="currentProgress" format="float" />
+        <attr name="currentProgress" format="integer" />
         <!--最大进度-->
-        <attr name="maxProgress" format="float" />
-        <!--第二层波浪的颜色-->
-        <attr name="second_color" format="color" />
-        <!--边框的颜色-->
-        <attr name="border_color" format="color" />
+        <attr name="maxProgress" format="integer" />
         <!--第二层波浪是否显示-->
         <attr name="second_show" format="boolean" />
+        <!--第二层波浪的颜色-->
+        <attr name="second_color" format="color" />
     </declare-styleable>
 
 </resources>

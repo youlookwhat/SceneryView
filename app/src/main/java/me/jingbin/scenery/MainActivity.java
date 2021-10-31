@@ -58,17 +58,12 @@ public class MainActivity extends AppCompatActivity {
         //设置字体数值显示监听
         circleWaveProgressView.setUpdateTextListener(new HorizontalWaveProgressView.UpdateTextListener() {
             @Override
-            public void updateText(float interpolatedTime, float currentProgress, float maxProgress) {
+            public void updateText(float currentProgress, float maxProgress) {
                 //取一位整数和并且保留两位小数
                 DecimalFormat decimalFormat = new DecimalFormat("0.00");
-                String text_value = decimalFormat.format(interpolatedTime * currentProgress / maxProgress * 110) + "%";
+                String text_value = decimalFormat.format(currentProgress * maxProgress);
                 //最终把格式好的内容(数值带进进度条)
                 tv_value.setText(text_value);
-            }
-
-            @Override
-            public void animatorEnd(boolean isEnd) {
-
             }
         });
         //设置进度和时间
@@ -77,13 +72,34 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 tv_progress.setText("识别中");
-                circleWaveProgressView.setProgress(85, 1500, new AnimatorListenerAdapter() {
+
+                circleWaveProgressView.setProgress(80, 1500, new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
-//                        tv_progress.setText("识别成功");
                     }
                 });
+
+//                tv_progress.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        circleWaveProgressView.setProgressEnd(1000, new AnimatorListenerAdapter() {
+//                            @Override
+//                            public void onAnimationEnd(Animator animation) {
+//                                super.onAnimationEnd(animation);
+//                                tv_progress.setText("识别成功");
+//                            }
+//                        });
+//                    }
+//                }, 1000);
+
+//                circleWaveProgressView.setProgressEnd(3000, new AnimatorListenerAdapter() {
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        super.onAnimationEnd(animation);
+//                        tv_progress.setText("识别成功");
+//                    }
+//                });
             }
         }, 1500);
     }
