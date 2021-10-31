@@ -28,6 +28,7 @@ import me.jingbin.scenery.wave.DensityUtil;
  * 横向双水波浪进度条
  *
  * @author jingbin
+ * https://github.com/youlookwhat/SceneryView
  **/
 public class HorizontalWaveProgressView extends View {
 
@@ -41,7 +42,7 @@ public class HorizontalWaveProgressView extends View {
     private final float waveHeight;
     //波浪组的数量 一个波浪是一低一高
     private int waveNumber;
-    //自定义View的波浪宽高
+    //默认View的宽高
     private int waveDefaultWidth;
     private int waveDefaultHeight;
     //测量后的View实际宽高
@@ -85,7 +86,8 @@ public class HorizontalWaveProgressView extends View {
     private int dp1;
     // 圆角角度
     private int dp27;
-
+    private RectF rectBg;
+    private RectF rectBorder;
 
     public HorizontalWaveProgressView(Context context) {
         this(context, null);
@@ -178,24 +180,30 @@ public class HorizontalWaveProgressView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         //这里用到了缓存 根据参数创建新位图
-        circleBitmap = Bitmap.createBitmap(waveActualSizeWidth, waveActualSizeHeight, Bitmap.Config.ARGB_8888);
+        if (circleBitmap == null) {
+            circleBitmap = Bitmap.createBitmap(waveActualSizeWidth, waveActualSizeHeight, Bitmap.Config.ARGB_8888);
+        }
         //以该bitmap为底创建一块画布
-        bitmapCanvas = new Canvas(circleBitmap);
+        if (bitmapCanvas == null) {
+            bitmapCanvas = new Canvas(circleBitmap);
+        }
         // 绘制背景，为了能让波浪填充完整个圆形背景
-        RectF rectBg = new RectF(0, 0, waveActualSizeWidth, waveActualSizeHeight);
+        if (rectBg == null) {
+            rectBg = new RectF(0, 0, waveActualSizeWidth, waveActualSizeHeight);
+        }
         bitmapCanvas.drawRoundRect(rectBg, dp27, dp27, backgroundPaint);
-
-
         if (isShowSecondWave) {
             //绘制第二层波浪
             bitmapCanvas.drawPath(canvasSecondPath(), secondWavePaint);
         }
-//绘制波浪形
+        //绘制波浪形
         bitmapCanvas.drawPath(canvasWavePath(), wavePaint);
         //裁剪图片
         canvas.drawBitmap(circleBitmap, 0, 0, null);
         // 绘制边框
-        RectF rectBorder = new RectF(0.5f * dp1, 0.5f * dp1, waveActualSizeWidth - 0.5f * dp1, waveActualSizeHeight - 0.5f * dp1);
+        if (rectBorder == null) {
+            rectBorder = new RectF(0.5f * dp1, 0.5f * dp1, waveActualSizeWidth - 0.5f * dp1, waveActualSizeHeight - 0.5f * dp1);
+        }
         canvas.drawRoundRect(rectBorder, dp27, dp27, borderPaint);
     }
 
@@ -207,7 +215,6 @@ public class HorizontalWaveProgressView extends View {
         wavePath.reset();
         //起始点移至(0,0) p0 -p1 的高度随着进度的变化而变化
         wavePath.moveTo((currentPercent) * waveActualSizeWidth, -moveDistance);
-//        wavePath.moveTo(-moveDistance,(1-currentPercent) * waveActualSize);
         //最多能绘制多少个波浪
         //其实也可以用 i < getWidth() ;i+=waveLength来判断 这个没那么完美
         //绘制p0 - p1 绘制波浪线 这里有一段是超出View的，在View右边距的右边 所以是* 2
@@ -216,10 +223,8 @@ public class HorizontalWaveProgressView extends View {
             wavePath.rQuadTo(-waveHeight, waveLength / 2, 0, waveLength);
         }
         //连接p1 - p2
-        wavePath.lineTo(waveActualSizeWidth, waveActualSizeHeight);
-        //连接p2 - p3
         wavePath.lineTo(0, waveActualSizeHeight);
-        //连接p3 - p0 p3-p0d的高度随着进度变化而变化
+        //连接p2 - p0
         wavePath.lineTo(0, 0);
         //封闭起来填充
         wavePath.close();
@@ -227,7 +232,7 @@ public class HorizontalWaveProgressView extends View {
     }
 
     /**
-     * 绘制第二层波浪方法
+     * 绘制第二层波浪
      */
     private Path canvasSecondPath() {
         float secondWaveHeight = waveHeight;
