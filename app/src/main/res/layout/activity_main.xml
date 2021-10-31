@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:wave="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
@@ -113,31 +114,38 @@
         app:layout_constraintTop_toBottomOf="@+id/juhua" />
 
 
-    <me.jingbin.scenery.CircleWaveProgressView2
-        android:id="@+id/progressView33"
+    <me.jingbin.scenery.HorizontalWaveProgressView
+        android:id="@+id/progress_horizontal"
         android:layout_width="152dp"
         android:layout_height="40dp"
         android:layout_marginTop="20dp"
-        app:currentProgress="10"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/juhua" />
+        app:layout_constraintTop_toBottomOf="@+id/juhua"
+        tools:currentProgress="65"
+        wave:border_color="@color/colorPrimary"
+        wave:circlebg_color="@color/colorWhite"
+        wave:currentProgress="110"
+        wave:maxProgress="110"
+        wave:second_color="@color/colorIconBg"
+        wave:second_show="true"
+        wave:wave_color="@color/colorPrimary" />
 
     <TextView
         android:id="@+id/tv_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:shadowColor="#B76EFF"
+        android:shadowColor="@color/colorPrimary"
         android:shadowDx="2.0"
         android:shadowDy="2.0"
-        android:shadowRadius="2.0"
-        android:text="识别中"
+        android:shadowRadius="4.0"
+        android:text="开始识别"
         android:textColor="@color/colorWhite"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/progressView33"
+        app:layout_constraintBottom_toBottomOf="@+id/progress_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/progressView33" />
+        app:layout_constraintTop_toTopOf="@+id/progress_horizontal" />
 
     <TextView
         android:id="@+id/tv_value"

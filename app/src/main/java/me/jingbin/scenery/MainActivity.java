@@ -1,5 +1,7 @@
 package me.jingbin.scenery;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -10,7 +12,6 @@ import java.text.DecimalFormat;
 
 import me.jingbin.scenery.progress.ProgressView;
 import me.jingbin.scenery.utils.ImageUtil;
-import me.jingbin.scenery.wave.WaveSlipView;
 import me.jingbin.scenery.wave.WaveSlipView2;
 
 
@@ -47,22 +48,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final CircleWaveProgressView2 circleWaveProgressView = findViewById(R.id.progressView33);
+        final HorizontalWaveProgressView circleWaveProgressView = findViewById(R.id.progress_horizontal);
         final TextView tv_value = findViewById(R.id.tv_value);
         final TextView tv_progress = findViewById(R.id.tv_progress);
         //是否绘制第二层波浪
-        circleWaveProgressView.isSetCanvasSecondWave(false);
+//        circleWaveProgressView.isSetCanvasSecondWave(false);
         //将TextView设置进度条里
-        circleWaveProgressView.setTextViewVaule(tv_value);
+//        circleWaveProgressView.setTextViewVaule(tv_value);
         //设置字体数值显示监听
-        circleWaveProgressView.setUpdateTextListener(new CircleWaveProgressView2.UpdateTextListener() {
+        circleWaveProgressView.setUpdateTextListener(new HorizontalWaveProgressView.UpdateTextListener() {
             @Override
-            public String updateText(float interpolatedTime, float currentProgress, float maxProgress) {
+            public void updateText(float interpolatedTime, float currentProgress, float maxProgress) {
                 //取一位整数和并且保留两位小数
                 DecimalFormat decimalFormat = new DecimalFormat("0.00");
-                String text_value = decimalFormat.format(interpolatedTime * currentProgress / maxProgress * 100) + "%";
+                String text_value = decimalFormat.format(interpolatedTime * currentProgress / maxProgress * 110) + "%";
                 //最终把格式好的内容(数值带进进度条)
-                return text_value;
+                tv_value.setText(text_value);
+            }
+
+            @Override
+            public void animatorEnd(boolean isEnd) {
+
             }
         });
         //设置进度和时间
@@ -71,7 +77,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 tv_progress.setText("识别中");
-                circleWaveProgressView.setProgress(80, 3000);
+                circleWaveProgressView.setProgress(85, 1500, new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+//                        tv_progress.setText("识别成功");
+                    }
+                });
             }
         }, 1500);
     }

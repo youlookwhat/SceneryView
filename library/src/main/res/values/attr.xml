@@ -43,21 +43,25 @@
 
 
     <!--这里的名字要和自定义的View名称一样，不然在xml布局中无法引用-->
-    <declare-styleable name="CircleWaveProgressView">
+    <declare-styleable name="HorizontalWaveProgressView">
         <!--波浪的颜色-->
-        <attr name="wave_color" format="color"></attr>
+        <attr name="wave_color" format="color" />
         <!--圆形背景颜色-->
-        <attr name="circlebg_color" format="color"></attr>
+        <attr name="circlebg_color" format="color" />
         <!--波浪长度-->
-        <attr name="wave_length" format="dimension"></attr>
+        <attr name="wave_length" format="dimension" />
         <!--波浪高度-->
-        <attr name="wave_height" format="dimension"></attr>
+        <attr name="wave_height" format="dimension" />
         <!--当前进度-->
-        <attr name="currentProgress" format="float"></attr>
+        <attr name="currentProgress" format="float" />
         <!--最大进度-->
-        <attr name="maxProgress" format="float"></attr>
+        <attr name="maxProgress" format="float" />
         <!--第二层波浪的颜色-->
-        <attr name="second_color" format="color"></attr>
+        <attr name="second_color" format="color" />
+        <!--边框的颜色-->
+        <attr name="border_color" format="color" />
+        <!--第二层波浪是否显示-->
+        <attr name="second_show" format="boolean" />
     </declare-styleable>
 
 </resources>
