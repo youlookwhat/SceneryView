@@ -3,6 +3,7 @@ package me.jingbin.scenery;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -49,12 +50,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final HorizontalWaveProgressView circleWaveProgressView = findViewById(R.id.progress_horizontal);
-        final TextView tv_value = findViewById(R.id.tv_value);
         final TextView tv_progress = findViewById(R.id.tv_progress);
-        //是否绘制第二层波浪
-//        circleWaveProgressView.isSetCanvasSecondWave(false);
-        //将TextView设置进度条里
-//        circleWaveProgressView.setTextViewVaule(tv_value);
         //设置字体数值显示监听
         circleWaveProgressView.setUpdateTextListener(new HorizontalWaveProgressView.UpdateTextListener() {
             @Override
@@ -62,12 +58,10 @@ public class MainActivity extends AppCompatActivity {
                 //取一位整数和并且保留两位小数
                 DecimalFormat decimalFormat = new DecimalFormat("0.00");
                 String text_value = decimalFormat.format(currentProgress * maxProgress);
-                //最终把格式好的内容(数值带进进度条)
-                tv_value.setText(text_value);
+                Log.e("progress", String.valueOf(text_value));
             }
         });
         //设置进度和时间
-//        circleWaveProgressView.setProgress(5, 100);
         circleWaveProgressView.postDelayed(new Runnable() {
             @Override
             public void run() {
