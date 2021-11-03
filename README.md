@@ -1,3 +1,4 @@
+## View
 
 [![](https://jitpack.io/v/youlookwhat/SceneryView.svg)](https://jitpack.io/#youlookwhat/SceneryView) [![minSdk for Scenery](https://img.shields.io/badge/minSdk-15-green.svg)](#)
 
@@ -11,14 +12,13 @@
  - 对应文章：[《自定义View实现Dribbble上动感的Gallery App Icon》](https://juejin.cn/post/7024883320269832205)
 
 
----
 
 ### 2.HorizontalWaveProgressView
-![](https://github.com/youlookwhat/SceneryView/blob/master/art/S HorizontalWaveProgressView.GIF?raw=true)
+![](https://github.com/youlookwhat/SceneryView/blob/master/art/HorizontalWaveProgressView.GIF?raw=true)
 
  - 对应文章：[《自定义View实现横向的双水波纹进度条》](https://juejin.cn/post/7025249776069246984)
 
----
+--
 
 ### Usage
 #### Gradle
