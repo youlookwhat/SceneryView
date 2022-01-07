@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="55dp"
+    android:layout_centerInParent="true">
+
+
+    <RelativeLayout
+        android:id="@+id/rl_expand"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="#BBE4FE"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginLeft="62dp"
+            android:layout_marginRight="62dp"
+            android:background="@drawable/button_shape_bg_anim" />
+
+
+        <TextView
+            android:id="@+id/tv_write_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="75dp"
+            android:layout_marginLeft="75dp"
+            android:text="提问"
+            android:textColor="#ffffff"
+            android:textSize="12sp"
+            android:paddingLeft="18dp"
+            android:paddingRight="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_write_article"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="75dp"
+            android:layout_marginRight="75dp"
+            android:text="笔记"
+            android:textColor="#ffffff"
+            android:textSize="12sp"
+            android:paddingRight="18dp"
+            android:paddingLeft="10dp"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/image_bg"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/button_shape_oval" />
+
+    <ImageView
+        android:id="@+id/image_add"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/button_icon_add" />
+</RelativeLayout>

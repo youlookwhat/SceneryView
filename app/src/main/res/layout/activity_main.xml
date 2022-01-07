@@ -147,4 +147,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/progress_horizontal" />
 
+    <!--底部按钮的展开收起布局-->
+    <me.jingbin.scenery.animbutton.AnimButtonLayout
+        android:id="@+id/animButtonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progress_horizontal" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

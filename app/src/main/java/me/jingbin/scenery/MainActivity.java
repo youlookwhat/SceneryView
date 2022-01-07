@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.DecimalFormat;
 
+import me.jingbin.scenery.animbutton.AnimButtonClickListener;
+import me.jingbin.scenery.animbutton.AnimButtonLayout;
 import me.jingbin.scenery.progress.ProgressView;
 import me.jingbin.scenery.utils.ImageUtil;
 import me.jingbin.scenery.wave.WaveSlipView2;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 横向双水波浪进度条
         final HorizontalWaveProgressView circleWaveProgressView = findViewById(R.id.progress_horizontal);
         final TextView tv_progress = findViewById(R.id.tv_progress);
         //设置字体数值显示监听
@@ -96,15 +99,34 @@ public class MainActivity extends AppCompatActivity {
 //                });
             }
         }, 1500);
+
+
+        // 展开式View
+        final AnimButtonLayout animButtonLayout = findViewById(R.id.animButtonLayout);
+        animButtonLayout.setClickListener(new AnimButtonClickListener() {
+            @Override
+            public void onExpand() {
+                animButtonLayout.expandView();
+            }
+
+            @Override
+            public void onAsk() {
+                Log.e("onAsk", "-----提问");
+                animButtonLayout.hideView();
+            }
+
+            @Override
+            public void onPublish() {
+                Log.e("onPublish", "-----笔记");
+                animButtonLayout.hideView();
+            }
+        });
     }
 
     public void start(View view) {
         SceneryView sceneryIcon = findViewById(R.id.scenery_icon);
         sceneryIcon.playAnimator();
-
         final SceneryView scenery = findViewById(R.id.scenery);
-
-
         ImageUtil.saveToLocal(this, ImageUtil.createViewBitmap(scenery));
 //        scenery.setOnAnimationListener(new SceneryView.AnimationListener() {
 //            @Override
